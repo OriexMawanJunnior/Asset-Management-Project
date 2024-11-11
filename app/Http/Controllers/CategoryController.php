@@ -4,84 +4,113 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Category;
+use Illuminate\Http\JsonResponse;
 
-class CategoryController 
+class CategoryController
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the categories.
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        return Category::all();
+        $categories = Category::all();
+
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Categories retrieved successfully',
+            'data' => $categories
+        ]);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created category.
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string',
-            'code' => 'required|string|max:3',
-            'remaks' => 'required|string',
-        ]);
+        $validatedData = $request->validate($this->validationRules());
 
         $category = Category::create($validatedData);
-        return response()->json($category, 201);
+
+        return response()->json([
+            'status_code' => 201,
+            'message' => 'Category created successfully',
+            'data' => $category
+        ], 201);
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified category.
      */
-    public function show(string $id)
+    public function show(string $id): JsonResponse
     {
-        $category = Category::find($id);
+        $category = $this->findCategoryOrFail($id);
 
-        if(!$category){
-            return response()->json(['message' => 'category not found'], 404);
-        }
-
-        return response()->json($category);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        $category = Category::find($id);
-
-        if(!$category){
-            return response()->json(['message' => 'category not found'], 404);
-        }
-
-        $validatedData = $request->validate([
-            'name' => 'required|string',
-            'code' => 'required|string|max:3',
-            'remaks' => 'required|string',
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Category retrieved successfully',
+            'data' => $category
         ]);
+    }
 
-        // Memperbarui asset dengan data yang valid
+    /**
+     * Update the specified category.
+     */
+    public function update(Request $request, string $id): JsonResponse
+    {
+        $category = $this->findCategoryOrFail($id);
+
+        $validatedData = $request->validate($this->validationRules());
+
         $category->update($validatedData);
 
-        // Mengembalikan category yang telah diperbarui dalam format JSON
-        return response()->json($category);
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Category updated successfully',
+            'data' => $category
+        ]);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified category.
      */
-    public function destroy(string $id)
+    public function destroy(string $id): JsonResponse
     {
-        $category = Category::find($id);
-
-        if(!$category){
-            return response()->json(['message' => 'category not found'], 404);
-        }
+        $category = $this->findCategoryOrFail($id);
 
         $category->delete();
 
-        // Mengembalikan respons sukses
-        return response()->json(['message' => 'Asset deleted successfully'], 200);
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Category deleted successfully'
+        ]);
+    }
+
+    /**
+     * Validation rules for storing and updating categories.
+     */
+    private function validationRules(): array
+    {
+        return [
+            'name' => 'required|string',
+            'code' => 'required|string|max:3',
+            'remaks' => 'required|string',
+        ];
+    }
+
+    /**
+     * Find a category by ID or return a 404 error response.
+     */
+    private function findCategoryOrFail(string $id): Category
+    {
+        $category = Category::find($id);
+
+        if (!$category) {
+            abort(response()->json([
+                'status_code' => 404,
+                'message' => 'Category not found'
+            ], 404));
+        }
+
+        return $category;
     }
 }

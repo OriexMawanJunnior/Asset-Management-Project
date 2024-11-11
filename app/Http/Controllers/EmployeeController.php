@@ -4,80 +4,112 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Employee;
+use Illuminate\Http\JsonResponse;
 
-class EmployeeController 
+class EmployeeController
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the employees.
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        return Employee::all();
-    }
+        $employees = Employee::all();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $validate = $request->validate([
-            'name' => 'required|string',
-            'departement' => 'required|string',
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Employees retrieved successfully',
+            'data' => $employees
         ]);
-
-        $employee = Employee::create($validate);
-
-        return response()->json($employee, 201);
     }
 
     /**
-     * Display the specified resource.
+     * Store a newly created employee.
      */
-    public function show(string $id)
+    public function store(Request $request): JsonResponse
     {
-        $employee = Employee::find($id);
+        $validatedData = $request->validate($this->validationRules());
 
-        if(!$employee){
-            return response()->json(['message' => 'employee not found'], 404);
-        }
+        $employee = Employee::create($validatedData);
 
-        return response()->json($employee);
+        return response()->json([
+            'status_code' => 201,
+            'message' => 'Employee created successfully',
+            'data' => $employee
+        ], 201);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Display the specified employee.
      */
-    public function update(Request $request, string $id)
+    public function show(string $id): JsonResponse
     {
-        $employee = Employee::find($id);
+        $employee = $this->findEmployeeOrFail($id);
 
-        if(!$employee){
-            return response()->json(['message' => 'employee not found'], 404);
-        }
-
-        $validate = $request->validate([
-            'name' => 'required|string',
-            'departement' => 'required|string',
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Employee retrieved successfully',
+            'data' => $employee
         ]);
-
-        $employee->update($validate);
-
-        return response()->json($employee, 200);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Update the specified employee.
      */
-    public function destroy(string $id)
+    public function update(Request $request, string $id): JsonResponse
     {
-        $employee = Employee::find($id);
+        $employee = $this->findEmployeeOrFail($id);
 
-        if(!$employee){
-            return response()->json(['message' => 'employee not found'], 404);
-        }
+        $validatedData = $request->validate($this->validationRules());
+
+        $employee->update($validatedData);
+
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Employee updated successfully',
+            'data' => $employee
+        ]);
+    }
+
+    /**
+     * Remove the specified employee.
+     */
+    public function destroy(string $id): JsonResponse
+    {
+        $employee = $this->findEmployeeOrFail($id);
 
         $employee->delete();
 
-        return response()->json(['message'=> 'employee deleted']);
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Employee deleted successfully'
+        ]);
+    }
+
+    /**
+     * Validation rules for storing and updating employees.
+     */
+    private function validationRules(): array
+    {
+        return [
+            'name' => 'required|string',
+            'departement' => 'required|string',
+        ];
+    }
+
+    /**
+     * Find an employee by ID or return a 404 error response.
+     */
+    private function findEmployeeOrFail(string $id): Employee
+    {
+        $employee = Employee::find($id);
+
+        if (!$employee) {
+            abort(response()->json([
+                'status_code' => 404,
+                'message' => 'Employee not found'
+            ], 404));
+        }
+
+        return $employee;
     }
 }

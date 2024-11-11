@@ -4,87 +4,115 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Borrowing;
+use Illuminate\Http\JsonResponse;
 
-class BorrowingController 
+class BorrowingController
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the borrowings.
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        return Borrowing::all();
-    }
+        $borrowings = Borrowing::all();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $validate = $request->validate([
-            'date_of_receipt' => 'required|date',
-            'date_of_return' => 'nullable|date',
-            'status' => 'required|in:borrowed,returned,late',
-            'asset_id' => 'required|exists:assets, asset_id',
-            'employee_id' => 'required|exists:employee, id',
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Borrowings retrieved successfully',
+            'data' => $borrowings
         ]);
-
-        $borrowing = Borrowing::create($validate);
-
-        return response()->json($borrowing, 201);
     }
 
     /**
-     * Display the specified resource.
+     * Store a newly created borrowing.
      */
-    public function show(string $id)
+    public function store(Request $request): JsonResponse
     {
-        $borrowing = Borrowing::find($id);
+        $validatedData = $request->validate($this->validationRules());
 
-        if(!$borrowing){
-            return response()->json(['message' => 'borrowing not found'], 404);
-        }
+        $borrowing = Borrowing::create($validatedData);
 
-        return response()->json($borrowing);
+        return response()->json([
+            'status_code' => 201,
+            'message' => 'Borrowing created successfully',
+            'data' => $borrowing
+        ], 201);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Display the specified borrowing.
      */
-    public function update(Request $request, string $id)
+    public function show(string $id): JsonResponse
     {
-        $borrowing = Borrowing::find($id);
+        $borrowing = $this->findBorrowingOrFail($id);
 
-        if(!$borrowing){
-            return response()->json(['message' => 'borrowing not found'], 404);
-        }
-
-        $validate = $request->validate([
-            'date_of_receipt' => 'required|date',
-            'date_of_return' => 'nullable|date',
-            'status' => 'required|in:borrowed,returned,late',
-            'asset_id' => 'required|exists:assets, asset_id',
-            'employee_id' => 'required|exists:employee, id',
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Borrowing retrieved successfully',
+            'data' => $borrowing
         ]);
-
-        $borrowing->update($validate);
-
-        return response()->json($borrowing);
-        
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Update the specified borrowing.
      */
-    public function destroy(string $id)
+    public function update(Request $request, string $id): JsonResponse
     {
-        $borrowing = Borrowing::find($id);
+        $borrowing = $this->findBorrowingOrFail($id);
 
-        if(!$borrowing){
-            return response()->json(['message' => 'borrowing not found'], 404);
-        }
+        $validatedData = $request->validate($this->validationRules());
+
+        $borrowing->update($validatedData);
+
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Borrowing updated successfully',
+            'data' => $borrowing
+        ]);
+    }
+
+    /**
+     * Remove the specified borrowing.
+     */
+    public function destroy(string $id): JsonResponse
+    {
+        $borrowing = $this->findBorrowingOrFail($id);
 
         $borrowing->delete();
 
-        return response()->json(['message' => 'deleted is succesfull'], 200);
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Borrowing deleted successfully'
+        ]);
+    }
+
+    /**
+     * Get validation rules for storing and updating borrowings.
+     */
+    private function validationRules(): array
+    {
+        return [
+            'date_of_receipt' => 'required|date',
+            'date_of_return' => 'nullable|date',
+            'status' => 'required|in:borrowed,returned,late',
+            'asset_id' => 'required|exists:assets,asset_id',
+            'employee_id' => 'required|exists:employee,id',
+        ];
+    }
+
+    /**
+     * Find a borrowing by ID or return a 404 error response.
+     */
+    private function findBorrowingOrFail(string $id): Borrowing
+    {
+        $borrowing = Borrowing::find($id);
+
+        if (!$borrowing) {
+            abort(response()->json([
+                'status_code' => 404,
+                'message' => 'Borrowing not found'
+            ], 404));
+        }
+
+        return $borrowing;
     }
 }

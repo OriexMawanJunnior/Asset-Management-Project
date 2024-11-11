@@ -4,79 +4,91 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Asset;
+use Illuminate\Http\JsonResponse;
 
-class AssetController  
+class AssetController
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the assets.
      */
     public function index()
     {
-        return Asset::all();
+        $assets = Asset::paginate(10); // 10 items per halaman
+        return view('page.asset', compact('assets'));
+    }
+    public function showCreateForm(){
+        return view('page.asset.create');
     }
 
-    public function store(Request $request)
+    /**
+     * Store a new asset.
+     */
+    public function store(Request $request): JsonResponse
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'merk' => 'nullable|string|max:255',
-            'color' => 'nullable|string|max:50',
-            'serial_number' => 'nullable|string|max:100',
-            'purchase_order_number' => 'nullable|string|max:100',
-            'purchase_price' => 'nullable|numeric',
-            'quantity' => 'required|integer',
-            'condition' => 'required|string|max:50',
-            'status' => 'required|string|max:50',
-            'remaks' => 'nullable|string',
-            'location' => 'nullable|string|max:255',
-            'asset_detail_url' => 'nullable|url',
-            'qr_code_path' => 'nullable|string|max:255',
-            'date_of_receipt' => 'required|date',
-            'category_id' => 'required|integer|exists:category,id',
-            'subcategory_id' => 'required|integer|exists:subcategory,id',
-            'number' => 'nullable|integer'
-        ]);
+        $validatedData = $request->validate($this->validationRules());
 
-        // Buat asset baru dengan data yang valid
         $asset = Asset::create($validatedData);
 
-        // Berikan response sukses
-        return response()->json($asset, 201);
-    }
-
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-         // Mengambil asset berdasarkan ID
-         $asset = Asset::find($id);
-
-         // Memeriksa apakah asset ditemukan
-         if (!$asset) {
-             return response()->json(['message' => 'Asset not found'], 404);
-         }
- 
-         // Mengembalikan asset dalam format JSON
-         return response()->json($asset);
+        return response()->json([
+            'status_code' => 201,
+            'message' => 'Asset created successfully',
+            'data' => $asset
+        ], 201);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Display the specified asset.
      */
-    public function update(Request $request, string $id)
+    public function show(string $id): JsonResponse
     {
-        // Mengambil asset berdasarkan ID
-        $asset = Asset::find($id);
+        $asset = $this->findAssetOrFail($id);
 
-        // Memeriksa apakah asset ditemukan
-        if (!$asset) {
-            return response()->json(['message' => 'Asset not found'], 404);
-        }
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Asset retrieved successfully',
+            'data' => $asset
+        ]);
+    }
 
-        // Validasi data yang diterima
-        $validatedData = $request->validate([
+    /**
+     * Update the specified asset.
+     */
+    public function update(Request $request, string $id): JsonResponse
+    {
+        $asset = $this->findAssetOrFail($id);
+
+        $validatedData = $request->validate($this->validationRules());
+
+        $asset->update($validatedData);
+
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Asset updated successfully',
+            'data' => $asset
+        ]);
+    }
+
+    /**
+     * Remove the specified asset.
+     */
+    public function destroy(string $id): JsonResponse
+    {
+        $asset = $this->findAssetOrFail($id);
+        
+        $asset->delete();
+
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Asset deleted successfully'
+        ]);
+    }
+
+    /**
+     * Get validation rules for storing and updating assets.
+     */
+    private function validationRules(): array
+    {
+        return [
             'name' => 'required|string|max:255',
             'merk' => 'nullable|string|max:255',
             'color' => 'nullable|string|max:50',
@@ -94,32 +106,23 @@ class AssetController
             'category_id' => 'required|integer|exists:category,id',
             'subcategory_id' => 'required|integer|exists:subcategory,id',
             'number' => 'nullable|integer'
-        ]);
-
-        // Memperbarui asset dengan data yang valid
-        $asset->update($validatedData);
-
-        // Mengembalikan asset yang telah diperbarui dalam format JSON
-        return response()->json($asset);
+        ];
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Find an asset by ID or return a 404 error response.
      */
-    public function destroy(string $id)
+    private function findAssetOrFail(string $id): Asset
     {
-        // Mengambil asset berdasarkan ID
         $asset = Asset::find($id);
 
-        // Memeriksa apakah asset ditemukan
         if (!$asset) {
-            return response()->json(['message' => 'Asset not found'], 404);
+            abort(response()->json([
+                'status_code' => 404,
+                'message' => 'Asset not found'
+            ], 404));
         }
 
-        // Menghapus asset
-        $asset->delete();
-
-        // Mengembalikan respons sukses
-        return response()->json(['message' => 'Asset deleted successfully'], 200);
+        return $asset;
     }
 }

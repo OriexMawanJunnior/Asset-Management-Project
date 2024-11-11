@@ -40,6 +40,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'api' => [
+            'driver' => 'sanctum',  // Pastikan ini diset ke sanctum
+            'provider' => 'users',
+        ],
     ],
 
     /*

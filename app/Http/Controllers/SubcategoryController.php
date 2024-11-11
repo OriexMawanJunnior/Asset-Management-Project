@@ -4,68 +4,113 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Subcategory;
+use Illuminate\Http\JsonResponse;
 
-class SubcategoryController 
+class SubcategoryController
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the subcategories.
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        return Subcategory::all();
+        $subcategories = Subcategory::all();
+
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Subcategories retrieved successfully',
+            'data' => $subcategories
+        ]);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created subcategory.
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        $validate = $request->validate([
+        $validatedData = $request->validate($this->validationRules());
+
+        $subcategory = Subcategory::create($validatedData);
+
+        return response()->json([
+            'status_code' => 201,
+            'message' => 'Subcategory created successfully',
+            'data' => $subcategory
+        ], 201);
+    }
+
+    /**
+     * Display the specified subcategory.
+     */
+    public function show(string $id): JsonResponse
+    {
+        $subcategory = $this->findSubcategoryOrFail($id);
+
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Subcategory retrieved successfully',
+            'data' => $subcategory
+        ]);
+    }
+
+    /**
+     * Update the specified subcategory.
+     */
+    public function update(Request $request, string $id): JsonResponse
+    {
+        $subcategory = $this->findSubcategoryOrFail($id);
+
+        $validatedData = $request->validate($this->validationRules());
+
+        $subcategory->update($validatedData);
+
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Subcategory updated successfully',
+            'data' => $subcategory
+        ]);
+    }
+
+    /**
+     * Remove the specified subcategory.
+     */
+    public function destroy(string $id): JsonResponse
+    {
+        $subcategory = $this->findSubcategoryOrFail($id);
+
+        $subcategory->delete();
+
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Subcategory deleted successfully'
+        ]);
+    }
+
+    /**
+     * Validation rules for storing and updating subcategories.
+     */
+    private function validationRules(): array
+    {
+        return [
             'name' => 'required|string',
             'code' => 'required|string|max:3',
-            'category_id' => 'required|exists:category,id',
-        ]);
-
-        $subcategory = Subcategory::create($validate);
-
-        return response()->json($subcategory, 201);
+            'category_id' => 'required|exists:categories,id',
+        ];
     }
 
     /**
-     * Display the specified resource.
+     * Find a subcategory by ID or return a 404 error response.
      */
-    public function show(string $id)
+    private function findSubcategoryOrFail(string $id): Subcategory
     {
         $subcategory = Subcategory::find($id);
 
-        if(!$subcategory){
-            return response()->json(['message' => 'subcategory not found'], 404);
+        if (!$subcategory) {
+            abort(response()->json([
+                'status_code' => 404,
+                'message' => 'Subcategory not found'
+            ], 404));
         }
 
-        return response()->json($subcategory);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        $subcategory = Subcategory::find($id);
-
-        if(!$subcategory){
-            return response()->json(['message' => 'subcategory not found'], 404);
-        }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        $subcategory = Subcategory::find($id);
-
-        if(!$subcategory){
-            return response()->json(['message' => 'subcategory not found'], 404);
-        }
+        return $subcategory;
     }
 }
