@@ -1,4 +1,4 @@
-@extends('layouts.asset')
+@extends('layouts.blank')
 
 @section('title', 'Asset Create')
 
@@ -10,7 +10,7 @@
                 <div class="divide-y divide-gray-200">
                     <div class="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
                         <h2 class="text-2xl font-bold mb-6">Create New Asset</h2>
-                        <form action="#" method="POST" class="space-y-6">
+                        <form action="{{route('assets.store')}}" method="POST" class="space-y-6">
                             @csrf
                             
                             {{-- Basic Information --}}
@@ -21,33 +21,40 @@
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 </div>
 
-                                {{-- Category with Autocomplete --}}
-                                <div>
-                                    <label for="category" class="text-sm font-medium text-gray-700">Category *</label>
-                                    <div class="relative">
-                                        <input type="text" id="category_search" 
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                            placeholder="Search category...">
-                                        <input type="hidden" name="category_id" id="category_id" required>
-                                        <div id="category_suggestions" class="absolute z-10 w-full bg-white shadow-lg rounded-md hidden">
-                                            <!-- JavaScript will populate this -->
-                                        </div>
-                                    </div>
-                                </div>
+                                {{-- Reusable Autocomplete Component --}}
+                                @php
+                                $fields = [
+                                    [
+                                        'id' => 'category',
+                                        'label' => 'Category',
+                                        'placeholder' => 'Search category...'
+                                    ],
+                                    [
+                                        'id' => 'subcategory',
+                                        'label' => 'Subcategory',
+                                        'placeholder' => 'Search subcategory...'
+                                    ]
+                                ];
+                                @endphp
 
-                                {{-- Subcategory with Autocomplete --}}
+                                @foreach($fields as $field)
                                 <div>
-                                    <label for="subcategory" class="text-sm font-medium text-gray-700">Subcategory *</label>
+                                <label for="{{ $field['id'] }}" class="text-sm font-medium text-gray-700">{{ $field['label'] }} *</label>
                                     <div class="relative">
-                                        <input type="text" id="subcategory_search" 
+                                        <input type="text" 
+                                            id="{{ $field['id'] }}_search" 
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                            placeholder="Search subcategory...">
-                                        <input type="hidden" name="subcategory_id" id="subcategory_id" required>
-                                        <div id="subcategory_suggestions" class="absolute z-10 w-full bg-white shadow-lg rounded-md hidden">
-                                            <!-- JavaScript will populate this -->
+                                            placeholder="{{ $field['placeholder'] }}">
+                                        <input type="hidden" 
+                                            name="{{ $field['id'] }}_id" 
+                                            id="{{ $field['id'] }}_id" 
+                                            required>
+                                        <div id="{{ $field['id'] }}_suggestions" 
+                                            class="absolute z-10 w-full bg-white shadow-lg rounded-md hidden">
                                         </div>
                                     </div>
                                 </div>
+                                @endforeach
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
@@ -139,12 +146,6 @@
                                     <input type="date" name="date_of_receipt" id="date_of_receipt" required
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 </div>
-
-                                <div>
-                                    <label for="number" class="text-sm font-medium text-gray-700">Number</label>
-                                    <input type="number" name="number" id="number"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                </div>
                             </div>
 
                             <div class="pt-5">
@@ -166,4 +167,104 @@
         </div>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Data dari controller
+    const categories = @json($categories);
+    const subcategories = @json($subcategories);
+
+    // Konfigurasi untuk tiap field
+    const fieldsConfig = {
+        category: {
+            data: categories,
+            dependentField: 'subcategory'
+        },
+        subcategory: {
+            data: subcategories,
+            parentField: 'category',
+            filterBy: 'category_id'
+        }
+    };
+
+    // Setup autocomplete untuk setiap field
+    Object.keys(fieldsConfig).forEach(fieldName => {
+        setupAutocomplete(fieldName, fieldsConfig[fieldName]);
+    });
+
+    function setupAutocomplete(fieldName, config) {
+        const searchInput = document.getElementById(`${fieldName}_search`);
+        const hiddenInput = document.getElementById(`${fieldName}_id`);
+        const suggestionBox = document.getElementById(`${fieldName}_suggestions`);
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            if (searchTerm.length < 1) {
+                suggestionBox.classList.add('hidden');
+                return;
+            }
+            
+            let filteredData = config.data;
+            
+            // Jika ini adalah subcategory, filter berdasarkan category yang dipilih
+            if (config.parentField) {
+                const parentId = document.getElementById(`${config.parentField}_id`).value;
+                filteredData = filteredData.filter(item => 
+                    item[config.filterBy].toString() === parentId
+                );
+            }
+            
+            // Filter berdasarkan search term
+            filteredData = filteredData.filter(item =>
+                item.name.toLowerCase().includes(searchTerm)
+            );
+            
+            if (filteredData.length > 0) {
+                suggestionBox.innerHTML = filteredData.map(item => `
+                    <div class="p-2 hover:bg-gray-100 cursor-pointer" 
+                        data-id="${item.id}" 
+                        data-name="${item.name}">
+                        ${item.name}
+                    </div>
+                `).join('');
+                
+                suggestionBox.classList.remove('hidden');
+                
+                // Event click untuk setiap saran
+                suggestionBox.querySelectorAll('div').forEach(div => {
+                    div.addEventListener('click', function() {
+                        searchInput.value = this.dataset.name;
+                        hiddenInput.value = this.dataset.id;
+                        suggestionBox.classList.add('hidden');
+                        
+                        // Reset dependent field jika ada
+                        if (config.dependentField) {
+                            const dependentSearch = document.getElementById(`${config.dependentField}_search`);
+                            const dependentId = document.getElementById(`${config.dependentField}_id`);
+                            if (dependentSearch && dependentId) {
+                                dependentSearch.value = '';
+                                dependentId.value = '';
+                            }
+                        }
+                    });
+                });
+            } else {
+                suggestionBox.classList.add('hidden');
+            }
+        });
+    }
+
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        Object.keys(fieldsConfig).forEach(fieldName => {
+            const searchInput = document.getElementById(`${fieldName}_search`);
+            const suggestionBox = document.getElementById(`${fieldName}_suggestions`);
+            
+            if (!searchInput.contains(e.target) && !suggestionBox.contains(e.target)) {
+                suggestionBox.classList.add('hidden');
+            }
+        });
+    });
+});
+</script>
 @endsection

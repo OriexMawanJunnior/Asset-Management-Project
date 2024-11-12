@@ -4,85 +4,77 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Employee;
-use Illuminate\Http\JsonResponse;
+
 
 class EmployeeController
 {
     /**
      * Display a listing of the employees.
      */
-    public function index(): JsonResponse
+    public function index()
     {
-        $employees = Employee::all();
-
-        return response()->json([
-            'status_code' => 200,
-            'message' => 'Employees retrieved successfully',
-            'data' => $employees
-        ]);
+        $employees = Employee::paginate(10);
+        return view('page.user.index', compact('employees'));
     }
 
     /**
-     * Store a newly created employee.
+     * Show the form for creating a new employee.
      */
-    public function store(Request $request): JsonResponse
+    public function create()
+    {
+        return view('page.user.create');
+    }
+
+    /**
+     * Store a newly created employee in storage.
+     */
+    public function store(Request $request)
     {
         $validatedData = $request->validate($this->validationRules());
-
-        $employee = Employee::create($validatedData);
-
-        return response()->json([
-            'status_code' => 201,
-            'message' => 'Employee created successfully',
-            'data' => $employee
-        ], 201);
+        Employee::create($validatedData);
+        return redirect()->route('users.index')
+            ->with('message', 'Employee created successfully');
     }
 
     /**
      * Display the specified employee.
      */
-    public function show(string $id): JsonResponse
+    public function show(string $id)
     {
         $employee = $this->findEmployeeOrFail($id);
-
-        return response()->json([
-            'status_code' => 200,
-            'message' => 'Employee retrieved successfully',
-            'data' => $employee
-        ]);
+        return view('page.user.show', compact('employee'));
     }
 
     /**
-     * Update the specified employee.
+     * Show the form for editing the specified employee.
      */
-    public function update(Request $request, string $id): JsonResponse
+    public function edit(string $id)
     {
         $employee = $this->findEmployeeOrFail($id);
+        return view('page.user.edit', compact('employee'));
+    }
 
+    /**
+     * Update the specified employee in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        $employee = $this->findEmployeeOrFail($id);
         $validatedData = $request->validate($this->validationRules());
-
         $employee->update($validatedData);
-
-        return response()->json([
-            'status_code' => 200,
-            'message' => 'Employee updated successfully',
-            'data' => $employee
-        ]);
+        return redirect()->route('users.index')
+            ->with('message', 'Employee updated successfully');
     }
 
     /**
-     * Remove the specified employee.
+     * Remove the specified employee from storage.
      */
-    public function destroy(string $id): JsonResponse
+    public function destroy(string $id)
     {
         $employee = $this->findEmployeeOrFail($id);
-
         $employee->delete();
-
-        return response()->json([
-            'status_code' => 200,
-            'message' => 'Employee deleted successfully'
-        ]);
+        return redirect()->route('users.index')
+            ->with('message', 'Employee deleted successfully');
     }
 
     /**
@@ -92,7 +84,8 @@ class EmployeeController
     {
         return [
             'name' => 'required|string',
-            'departement' => 'required|string',
+            'organization' => 'required|string',
+            'job_position' => 'required|string',
         ];
     }
 
@@ -104,10 +97,7 @@ class EmployeeController
         $employee = Employee::find($id);
 
         if (!$employee) {
-            abort(response()->json([
-                'status_code' => 404,
-                'message' => 'Employee not found'
-            ], 404));
+            abort(404, 'Employee not found');
         }
 
         return $employee;

@@ -14,10 +14,10 @@
                 <h1 class="text-2xl font-bold">
                     @if (Route::is('dashboard'))
                         Dashboard
-                    @elseif (Route::is('asset'))
-                        Asset
-                    @elseif (Route::is('user'))
-                        User
+                    @elseif (Route::is('assets.index'))
+                        Assets
+                    @elseif (Route::is('users.index'))
+                        Users
                     @elseif (Route::is('borrowing'))
                         Borrowing
                     @else

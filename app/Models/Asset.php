@@ -100,6 +100,7 @@ class Asset extends Model
     public static function generateAssetId($asset)
     {
         $locationCode = 'HQR'; // Ganti sesuai kebutuhan lokasi
+        $se = 'SE';
         $categoryCode = $asset->category->code ?? 'NNN'; // Ambil kode dari kategori
         $subCategoryCode = $asset->subcategory->code ?? 'NNN'; // Ambil kode dari subkategori
 
@@ -120,7 +121,7 @@ class Asset extends Model
 
         // Format asset_id
         $sequence = str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
-        $assetId = "{$locationCode}/{$categoryCode}-{$subCategoryCode}/{$receiptMonth}/{$receiptYear}/{$sequence}";
+        $assetId = "{$locationCode}/{$categoryCode}-{$subCategoryCode}/{$receiptMonth}/{$receiptYear}/{$se}/{$sequence}";
 
         return $assetId;
     }

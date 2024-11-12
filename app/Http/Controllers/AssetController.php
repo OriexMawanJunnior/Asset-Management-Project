@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Asset;
-use Illuminate\Http\JsonResponse;
+use App\Models\Category;
+use App\Models\Subcategory;
 
 class AssetController
 {
@@ -13,74 +14,72 @@ class AssetController
      */
     public function index()
     {
-        $assets = Asset::paginate(10); // 10 items per halaman
-        return view('page.asset', compact('assets'));
-    }
-    public function showCreateForm(){
-        return view('page.asset.create');
+        $assets = Asset::paginate(10); // 10 items per page
+        return view('page.asset.index', compact('assets'));
     }
 
     /**
-     * Store a new asset.
+     * Show the form for creating a new asset.
      */
-    public function store(Request $request): JsonResponse
+    public function create()
+    {
+        $categories = Category::select('id', 'name')->get();
+        $subcategories = Subcategory::select('id', 'name', 'category_id')->get();
+        return view('page.asset.create', compact('categories', 'subcategories'));
+    }
+
+    /**
+     * Store a newly created asset in storage.
+     */
+    public function store(Request $request)
     {
         $validatedData = $request->validate($this->validationRules());
-
-        $asset = Asset::create($validatedData);
-
-        return response()->json([
-            'status_code' => 201,
-            'message' => 'Asset created successfully',
-            'data' => $asset
-        ], 201);
+        Asset::create($validatedData);
+        return redirect()->route('assets.index')
+            ->with('message', 'Asset created successfully');
     }
 
     /**
      * Display the specified asset.
      */
-    public function show(string $id): JsonResponse
+    public function show(string $id)
     {
         $asset = $this->findAssetOrFail($id);
-
-        return response()->json([
-            'status_code' => 200,
-            'message' => 'Asset retrieved successfully',
-            'data' => $asset
-        ]);
+        return view('page.asset.show', compact('asset'));
     }
 
     /**
-     * Update the specified asset.
+     * Show the form for editing the specified asset.
      */
-    public function update(Request $request, string $id): JsonResponse
+    public function edit(string $id)
     {
         $asset = $this->findAssetOrFail($id);
+        $categories = Category::select('id', 'name')->get();
+        $subcategories = Subcategory::select('id', 'name', 'category_id')->get();
+        return view('page.asset.edit', compact('asset', 'categories', 'subcategories'));
+    }
 
+    /**
+     * Update the specified asset in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        $asset = $this->findAssetOrFail($id);
         $validatedData = $request->validate($this->validationRules());
-
         $asset->update($validatedData);
-
-        return response()->json([
-            'status_code' => 200,
-            'message' => 'Asset updated successfully',
-            'data' => $asset
-        ]);
+        return redirect()->route('assets.index')
+            ->with('message', 'Asset updated successfully');
     }
 
     /**
-     * Remove the specified asset.
+     * Remove the specified asset from storage.
      */
-    public function destroy(string $id): JsonResponse
+    public function destroy(string $id)
     {
         $asset = $this->findAssetOrFail($id);
-        
         $asset->delete();
-
-        return response()->json([
-            'status_code' => 200,
-            'message' => 'Asset deleted successfully'
-        ]);
+        return redirect()->route('assets.index')
+            ->with('message', 'Asset deleted successfully');
     }
 
     /**
@@ -117,10 +116,7 @@ class AssetController
         $asset = Asset::find($id);
 
         if (!$asset) {
-            abort(response()->json([
-                'status_code' => 404,
-                'message' => 'Asset not found'
-            ], 404));
+            abort(404, 'Asset not found');
         }
 
         return $asset;

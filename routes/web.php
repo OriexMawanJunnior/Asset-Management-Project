@@ -3,7 +3,9 @@
 use App\Http\Controllers\AssetController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BorrowingController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EmployeeController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/', [AuthController::class, 'show'])->name('login');
@@ -13,7 +15,8 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'showDashboard'])->name('dashboard');
-    Route::get('/assets', [AssetController::class,'index'])->name('asset');
-    Route::get('/assets/create', [AssetController::class,'showCreateForm'])->name('asset.create');
+    Route::resource('assets', AssetController::class);
+    Route::resource('users', EmployeeController::class);
+    Route::resource('borrowings', BorrowingController::class);
 });
 

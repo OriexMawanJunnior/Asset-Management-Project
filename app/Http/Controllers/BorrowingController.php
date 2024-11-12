@@ -4,28 +4,23 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Borrowing;
-use Illuminate\Http\JsonResponse;
+
 
 class BorrowingController
 {
     /**
      * Display a listing of the borrowings.
      */
-    public function index(): JsonResponse
+    public function index()
     {
-        $borrowings = Borrowing::all();
-
-        return response()->json([
-            'status_code' => 200,
-            'message' => 'Borrowings retrieved successfully',
-            'data' => $borrowings
-        ]);
+        $borrowings = Borrowing::paginate(10);
+        return view('page.borrowing.index', compact('borrowings'));
     }
 
     /**
      * Store a newly created borrowing.
      */
-    public function store(Request $request): JsonResponse
+    public function store(Request $request)
     {
         $validatedData = $request->validate($this->validationRules());
 
@@ -41,7 +36,7 @@ class BorrowingController
     /**
      * Display the specified borrowing.
      */
-    public function show(string $id): JsonResponse
+    public function show(string $id)
     {
         $borrowing = $this->findBorrowingOrFail($id);
 
@@ -55,7 +50,7 @@ class BorrowingController
     /**
      * Update the specified borrowing.
      */
-    public function update(Request $request, string $id): JsonResponse
+    public function update(Request $request, string $id)
     {
         $borrowing = $this->findBorrowingOrFail($id);
 
@@ -73,7 +68,7 @@ class BorrowingController
     /**
      * Remove the specified borrowing.
      */
-    public function destroy(string $id): JsonResponse
+    public function destroy(string $id)
     {
         $borrowing = $this->findBorrowingOrFail($id);
 

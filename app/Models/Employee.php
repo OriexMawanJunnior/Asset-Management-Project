@@ -20,7 +20,8 @@ class Employee extends Model
      */
     protected $fillable = [
         'name',
-        'departemen',
+        'organization',
+        'job_position',
     ];
 
     public function borrowings(){

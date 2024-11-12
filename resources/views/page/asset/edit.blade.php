@@ -1,6 +1,6 @@
-@extends('layouts.asset')
+@extends('layouts.blank')
 
-@section('title', 'Asset Edit')
+@section('title', 'Edit Asset')
 
 @section('content')
 <div class="min-h-screen py-6 flex flex-col justify-center sm:py-12">
@@ -9,56 +9,68 @@
             <div class="max-w-md mx-auto">
                 <div class="divide-y divide-gray-200">
                     <div class="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
-                        <h2 class="text-2xl font-bold mb-6">Create New Asset</h2>
-                        <form action="#" method="POST" class="space-y-6">
+                        <h2 class="text-2xl font-bold mb-6">Edit Asset</h2>
+                        
+                        <form action="{{ route('assets.update', $asset->id) }}" method="POST" class="space-y-6">
                             @csrf
+                            @method('PUT')
                             
-                            {{-- Basic Information --}}
                             <div class="space-y-4">
                                 <div>
                                     <label for="name" class="text-sm font-medium text-gray-700">Name *</label>
                                     <input type="text" name="name" id="name" required
+                                        value="{{ old('name', $asset->name) }}"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 </div>
-
-                                {{-- Category with Autocomplete --}}
+                                @php
+                                $fields = [
+                                    [
+                                        'id' => 'category',
+                                        'label' => 'Category',
+                                        'placeholder' => 'Search category...'
+                                    ],
+                                    [
+                                        'id' => 'subcategory',
+                                        'label' => 'Subcategory',
+                                        'placeholder' => 'Search subcategory...'
+                                    ]
+                                ];
+                                @endphp
+                                {{-- Autocomplete Components with Existing Values --}}
+                                @foreach($fields as $field)
                                 <div>
-                                    <label for="category" class="text-sm font-medium text-gray-700">Category *</label>
+                                    <label for="{{ $field['id'] }}" class="text-sm font-medium text-gray-700">{{ $field['label'] }} *</label>
                                     <div class="relative">
-                                        <input type="text" id="category_search" 
+                                        <input type="text" 
+                                            id="{{ $field['id'] }}_search" 
+                                            value="{{ $field['id'] == 'category' ? $asset->category->name : $asset->subcategory->name }}"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                            placeholder="Search category...">
-                                        <input type="hidden" name="category_id" id="category_id" required>
-                                        <div id="category_suggestions" class="absolute z-10 w-full bg-white shadow-lg rounded-md hidden">
-                                            <!-- JavaScript will populate this -->
+                                            placeholder="{{ $field['placeholder'] }}">
+                                        <input type="hidden" 
+                                            name="{{ $field['id'] }}_id" 
+                                            id="{{ $field['id'] }}_id" 
+                                            value="{{ $field['id'] == 'category' ? $asset->category_id : $asset->subcategory_id }}"
+                                            required>
+                                        <div id="{{ $field['id'] }}_suggestions" 
+                                            class="absolute z-10 w-full bg-white shadow-lg rounded-md hidden">
                                         </div>
                                     </div>
                                 </div>
+                                @endforeach
 
-                                {{-- Subcategory with Autocomplete --}}
-                                <div>
-                                    <label for="subcategory" class="text-sm font-medium text-gray-700">Subcategory *</label>
-                                    <div class="relative">
-                                        <input type="text" id="subcategory_search" 
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                            placeholder="Search subcategory...">
-                                        <input type="hidden" name="subcategory_id" id="subcategory_id" required>
-                                        <div id="subcategory_suggestions" class="absolute z-10 w-full bg-white shadow-lg rounded-md hidden">
-                                            <!-- JavaScript will populate this -->
-                                        </div>
-                                    </div>
-                                </div>
-
+                                {{-- The rest of the fields --}}
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label for="merk" class="text-sm font-medium text-gray-700">Merk</label>
                                         <input type="text" name="merk" id="merk"
+                                            value="{{ old('merk', $asset->merk) }}"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
 
                                     <div>
                                         <label for="color" class="text-sm font-medium text-gray-700">Color</label>
                                         <input type="text" name="color" id="color"
+                                            value="{{ old('color', $asset->color) }}"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                 </div>
@@ -67,12 +79,14 @@
                                     <div>
                                         <label for="serial_number" class="text-sm font-medium text-gray-700">Serial Number</label>
                                         <input type="text" name="serial_number" id="serial_number"
+                                            value="{{ old('serial_number', $asset->serial_number) }}"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
 
                                     <div>
                                         <label for="purchase_order_number" class="text-sm font-medium text-gray-700">PO Number</label>
                                         <input type="text" name="purchase_order_number" id="purchase_order_number"
+                                            value="{{ old('purchase_order_number', $asset->purchase_order_number) }}"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                 </div>
@@ -81,12 +95,14 @@
                                     <div>
                                         <label for="purchase_price" class="text-sm font-medium text-gray-700">Purchase Price</label>
                                         <input type="number" name="purchase_price" id="purchase_price" step="0.01"
+                                            value="{{ old('purchase_price', $asset->purchase_price) }}"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
 
                                     <div>
                                         <label for="quantity" class="text-sm font-medium text-gray-700">Quantity *</label>
                                         <input type="number" name="quantity" id="quantity" required
+                                            value="{{ old('quantity', $asset->quantity) }}"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                 </div>
@@ -97,21 +113,22 @@
                                         <select name="condition" id="condition" required
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                             <option value="">Select Condition</option>
-                                            <option value="new">New</option>
-                                            <option value="used">Used</option>
-                                            <option value="damaged">Damaged</option>
+                                            <option value="new" {{ old('condition', $asset->condition) == 'new' ? 'selected' : '' }}>New</option>
+                                            <option value="used" {{ old('condition', $asset->condition) == 'used' ? 'selected' : '' }}>Used</option>
+                                            <option value="damaged" {{ old('condition', $asset->condition) == 'damaged' ? 'selected' : '' }}>Damaged</option>
                                         </select>
                                     </div>
 
                                     <div>
                                         <label for="status" class="text-sm font-medium text-gray-700">Status *</label>
                                         <select name="status" id="status" required
+                                            value="{{ old('merk', $asset->status) }}"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                             <option value="">Select Status</option>
-                                            <option value="available">Available</option>
-                                            <option value="in_use">In Use</option>
-                                            <option value="maintenance">Maintenance</option>
-                                            <option value="disposed">Disposed</option>
+                                            <option value="available" {{ old('status', $asset->status) == 'available' ? 'selected' : '' }}>Available</option>
+                                            <option value="in_use" {{ old('status', $asset->status) == 'in_use' ? 'selected' : '' }}>In Use</option>
+                                            <option value="maintenance" {{ old('status', $asset->status) == 'maintenance' ? 'selected' : '' }}>Maintenance</option>
+                                            <option value="disposed" {{ old('status', $asset->status) == 'disposed' ? 'selected' : '' }}>Disposed</option>
                                         </select>
                                     </div>
                                 </div>
@@ -119,30 +136,27 @@
                                 <div>
                                     <label for="location" class="text-sm font-medium text-gray-700">Location</label>
                                     <input type="text" name="location" id="location"
+                                        value="{{ old('location', $asset->location) }}"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 </div>
 
                                 <div>
                                     <label for="remaks" class="text-sm font-medium text-gray-700">Remarks</label>
                                     <textarea name="remaks" id="remaks" rows="3"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"> {{ old('remaks', $asset->remaks) }}</textarea>
                                 </div>
 
                                 <div>
                                     <label for="asset_detail_url" class="text-sm font-medium text-gray-700">Asset Detail URL</label>
                                     <input type="url" name="asset_detail_url" id="asset_detail_url"
+                                        value="{{ old('merk', $asset->asset_detail_url) }}"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 </div>
 
                                 <div>
                                     <label for="date_of_receipt" class="text-sm font-medium text-gray-700">Date of Receipt *</label>
                                     <input type="date" name="date_of_receipt" id="date_of_receipt" required
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                </div>
-
-                                <div>
-                                    <label for="number" class="text-sm font-medium text-gray-700">Number</label>
-                                    <input type="number" name="number" id="number"
+                                        value="{{ old('date_of_receipt', \Carbon\Carbon::parse($asset->date_of_receipt)->format('Y-m-d'))}}"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 </div>
                             </div>
@@ -166,4 +180,105 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Data dari controller
+    const categories = @json($categories);
+    const subcategories = @json($subcategories);
+
+    // Konfigurasi untuk tiap field
+    const fieldsConfig = {
+        category: {
+            data: categories,
+            dependentField: 'subcategory'
+        },
+        subcategory: {
+            data: subcategories,
+            parentField: 'category',
+            filterBy: 'category_id'
+        }
+    };
+
+    // Setup autocomplete untuk setiap field
+    Object.keys(fieldsConfig).forEach(fieldName => {
+        setupAutocomplete(fieldName, fieldsConfig[fieldName]);
+    });
+
+    function setupAutocomplete(fieldName, config) {
+        const searchInput = document.getElementById(`${fieldName}_search`);
+        const hiddenInput = document.getElementById(`${fieldName}_id`);
+        const suggestionBox = document.getElementById(`${fieldName}_suggestions`);
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            if (searchTerm.length < 1) {
+                suggestionBox.classList.add('hidden');
+                return;
+            }
+            
+            let filteredData = config.data;
+            
+            // Jika ini adalah subcategory, filter berdasarkan category yang dipilih
+            if (config.parentField) {
+                const parentId = document.getElementById(`${config.parentField}_id`).value;
+                filteredData = filteredData.filter(item => 
+                    item[config.filterBy].toString() === parentId
+                );
+            }
+            
+            // Filter berdasarkan search term
+            filteredData = filteredData.filter(item =>
+                item.name.toLowerCase().includes(searchTerm)
+            );
+            
+            if (filteredData.length > 0) {
+                suggestionBox.innerHTML = filteredData.map(item => `
+                    <div class="p-2 hover:bg-gray-100 cursor-pointer" 
+                        data-id="${item.id}" 
+                        data-name="${item.name}">
+                        ${item.name}
+                    </div>
+                `).join('');
+                
+                suggestionBox.classList.remove('hidden');
+                
+                // Event click untuk setiap saran
+                suggestionBox.querySelectorAll('div').forEach(div => {
+                    div.addEventListener('click', function() {
+                        searchInput.value = this.dataset.name;
+                        hiddenInput.value = this.dataset.id;
+                        suggestionBox.classList.add('hidden');
+                        
+                        // Reset dependent field jika ada
+                        if (config.dependentField) {
+                            const dependentSearch = document.getElementById(`${config.dependentField}_search`);
+                            const dependentId = document.getElementById(`${config.dependentField}_id`);
+                            if (dependentSearch && dependentId) {
+                                dependentSearch.value = '';
+                                dependentId.value = '';
+                            }
+                        }
+                    });
+                });
+            } else {
+                suggestionBox.classList.add('hidden');
+            }
+        });
+    }
+
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        Object.keys(fieldsConfig).forEach(fieldName => {
+            const searchInput = document.getElementById(`${fieldName}_search`);
+            const suggestionBox = document.getElementById(`${fieldName}_suggestions`);
+            
+            if (!searchInput.contains(e.target) && !suggestionBox.contains(e.target)) {
+                suggestionBox.classList.add('hidden');
+            }
+        });
+    });
+});
+</script>
 @endsection
