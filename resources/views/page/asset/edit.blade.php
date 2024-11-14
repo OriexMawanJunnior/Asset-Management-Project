@@ -107,7 +107,6 @@
                                     </div>
                                 </div>
 
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label for="condition" class="text-sm font-medium text-gray-700">Condition *</label>
                                         <select name="condition" id="condition" required
@@ -118,26 +117,13 @@
                                             <option value="damaged" {{ old('condition', $asset->condition) == 'damaged' ? 'selected' : '' }}>Damaged</option>
                                         </select>
                                     </div>
-
-                                    <div>
-                                        <label for="status" class="text-sm font-medium text-gray-700">Status *</label>
-                                        <select name="status" id="status" required
-                                            value="{{ old('merk', $asset->status) }}"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                            <option value="">Select Status</option>
-                                            <option value="available" {{ old('status', $asset->status) == 'available' ? 'selected' : '' }}>Available</option>
-                                            <option value="in_use" {{ old('status', $asset->status) == 'in_use' ? 'selected' : '' }}>In Use</option>
-                                            <option value="maintenance" {{ old('status', $asset->status) == 'maintenance' ? 'selected' : '' }}>Maintenance</option>
-                                            <option value="disposed" {{ old('status', $asset->status) == 'disposed' ? 'selected' : '' }}>Disposed</option>
-                                        </select>
-                                    </div>
-                                </div>
-
+                                <input type="text" name="status" id="status" value="{{old('status', $asset->status)}}" class="hidden">
                                 <div>
                                     <label for="location" class="text-sm font-medium text-gray-700">Location</label>
                                     <input type="text" name="location" id="location"
                                         value="{{ old('location', $asset->location) }}"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        disabled>
                                 </div>
 
                                 <div>

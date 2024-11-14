@@ -8,6 +8,7 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController
 {
+
     public function show()
     {
         if (Auth::check()) {
@@ -19,10 +20,9 @@ class AuthController
     public function authenticate(Request $request)
     {
         $credentials = $request->validate([
-            'email' => ['required'],
+            'email' => ['required', 'email'],  
             'password' => ['required'],
         ]);
-        
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();

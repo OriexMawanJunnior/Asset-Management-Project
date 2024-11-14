@@ -9,18 +9,12 @@ use App\Models\Subcategory;
 
 class AssetController
 {
-    /**
-     * Display a listing of the assets.
-     */
     public function index()
     {
-        $assets = Asset::paginate(10); // 10 items per page
+        $assets = Asset::paginate(10); 
         return view('page.asset.index', compact('assets'));
     }
 
-    /**
-     * Show the form for creating a new asset.
-     */
     public function create()
     {
         $categories = Category::select('id', 'name')->get();
@@ -28,9 +22,6 @@ class AssetController
         return view('page.asset.create', compact('categories', 'subcategories'));
     }
 
-    /**
-     * Store a newly created asset in storage.
-     */
     public function store(Request $request)
     {
         $validatedData = $request->validate($this->validationRules());
@@ -39,19 +30,13 @@ class AssetController
             ->with('message', 'Asset created successfully');
     }
 
-    /**
-     * Display the specified asset.
-     */
-    public function show(string $id)
+    public function show(int $id)
     {
         $asset = $this->findAssetOrFail($id);
         return view('page.asset.show', compact('asset'));
     }
 
-    /**
-     * Show the form for editing the specified asset.
-     */
-    public function edit(string $id)
+    public function edit(int $id)
     {
         $asset = $this->findAssetOrFail($id);
         $categories = Category::select('id', 'name')->get();
@@ -59,10 +44,7 @@ class AssetController
         return view('page.asset.edit', compact('asset', 'categories', 'subcategories'));
     }
 
-    /**
-     * Update the specified asset in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, int $id)
     {
         $asset = $this->findAssetOrFail($id);
         $validatedData = $request->validate($this->validationRules());
@@ -71,10 +53,7 @@ class AssetController
             ->with('message', 'Asset updated successfully');
     }
 
-    /**
-     * Remove the specified asset from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(int $id)
     {
         $asset = $this->findAssetOrFail($id);
         $asset->delete();
@@ -82,9 +61,6 @@ class AssetController
             ->with('message', 'Asset deleted successfully');
     }
 
-    /**
-     * Get validation rules for storing and updating assets.
-     */
     private function validationRules(): array
     {
         return [
@@ -97,21 +73,18 @@ class AssetController
             'quantity' => 'required|integer',
             'condition' => 'required|string|max:50',
             'status' => 'required|string|max:50',
-            'remaks' => 'nullable|string',
+            'remarks' => 'nullable|string', 
             'location' => 'nullable|string|max:255',
             'asset_detail_url' => 'nullable|url',
             'qr_code_path' => 'nullable|string|max:255',
             'date_of_receipt' => 'required|date',
-            'category_id' => 'required|integer|exists:category,id',
-            'subcategory_id' => 'required|integer|exists:subcategory,id',
+            'category_id' => 'required|integer|exists:categories,id', 
+            'subcategory_id' => 'required|integer|exists:subcategories,id', 
             'number' => 'nullable|integer'
         ];
     }
 
-    /**
-     * Find an asset by ID or return a 404 error response.
-     */
-    private function findAssetOrFail(string $id): Asset
+    private function findAssetOrFail(int $id): Asset
     {
         $asset = Asset::find($id);
 

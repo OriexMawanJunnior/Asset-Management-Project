@@ -2,110 +2,96 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Asset;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 use App\Models\Borrowing;
-
+use Illuminate\Support\Facades\DB;
 
 class BorrowingController
 {
-    /**
-     * Display a listing of the borrowings.
-     */
     public function index()
     {
         $borrowings = Borrowing::paginate(10);
         return view('page.borrowing.index', compact('borrowings'));
     }
 
-    /**
-     * Store a newly created borrowing.
-     */
+    public function create()
+    {
+        $assets = Asset::select('id', 'asset_id', 'name')->get();
+        $employees = Employee::select('id', 'name')->get();
+        return view('page.borrowing.create', compact('assets', 'employees'));
+    }
+
     public function store(Request $request)
     {
         $validatedData = $request->validate($this->validationRules());
 
-        $borrowing = Borrowing::create($validatedData);
+        DB::transaction(function () use ($validatedData) {
+            Borrowing::create($validatedData);
 
-        return response()->json([
-            'status_code' => 201,
-            'message' => 'Borrowing created successfully',
-            'data' => $borrowing
-        ], 201);
+            $asset = Asset::findOrFail($validatedData['asset_id']);
+            $employee = Employee::findOrFail($validatedData['employee_id']);
+            
+            $asset->update([
+                'location' => $employee->name,
+                'status' => 'borrowed'
+            ]);
+        });
+
+        return redirect()->route('borrowings.index')
+            ->with('message', 'Borrowing created successfully for asset: ' . $validatedData['asset_id']);
     }
 
-    /**
-     * Display the specified borrowing.
-     */
-    public function show(string $id)
+    public function show(int $id)
     {
         $borrowing = $this->findBorrowingOrFail($id);
-
-        return response()->json([
-            'status_code' => 200,
-            'message' => 'Borrowing retrieved successfully',
-            'data' => $borrowing
-        ]);
+        return view('page.borrowing.show', compact('borrowing'));
     }
 
-    /**
-     * Update the specified borrowing.
-     */
-    public function update(Request $request, string $id)
+    public function edit(int $id)
     {
         $borrowing = $this->findBorrowingOrFail($id);
+        $assets = Asset::select('id', 'asset_id', 'name')->get();
+        $employees = Employee::select('id', 'name')->get();
+        return view('page.borrowing.edit', compact('borrowing', 'assets', 'employees'));
+    }
 
+    public function update(Request $request, int $id)
+    {
+        $borrowing = $this->findBorrowingOrFail($id);
         $validatedData = $request->validate($this->validationRules());
-
         $borrowing->update($validatedData);
-
-        return response()->json([
-            'status_code' => 200,
-            'message' => 'Borrowing updated successfully',
-            'data' => $borrowing
-        ]);
+        return redirect()->route('borrowings.index')
+            ->with('message', 'Borrowing updated successfully for asset: ' . $borrowing->asset->asset_id);
     }
 
-    /**
-     * Remove the specified borrowing.
-     */
-    public function destroy(string $id)
+    public function destroy(int $id)
     {
         $borrowing = $this->findBorrowingOrFail($id);
-
         $borrowing->delete();
 
-        return response()->json([
-            'status_code' => 200,
-            'message' => 'Borrowing deleted successfully'
-        ]);
+        return redirect()->route('borrowings.index')
+            ->with('message', 'Borrowing deleted successfully');
     }
 
-    /**
-     * Get validation rules for storing and updating borrowings.
-     */
     private function validationRules(): array
     {
         return [
             'date_of_receipt' => 'required|date',
-            'date_of_return' => 'nullable|date',
+            'date_of_return' => 'required|date|after:date_of_receipt',
             'status' => 'required|in:borrowed,returned,late',
-            'asset_id' => 'required|exists:assets,asset_id',
-            'employee_id' => 'required|exists:employee,id',
+            'asset_id' => 'required|exists:assets,id',
+            'employee_id' => 'required|exists:employees,id',
         ];
     }
 
-    /**
-     * Find a borrowing by ID or return a 404 error response.
-     */
-    private function findBorrowingOrFail(string $id): Borrowing
+    private function findBorrowingOrFail(int $id): Borrowing
     {
         $borrowing = Borrowing::find($id);
 
         if (!$borrowing) {
-            abort(response()->json([
-                'status_code' => 404,
-                'message' => 'Borrowing not found'
-            ], 404));
+            abort(404, 'Borrowing not found');
         }
 
         return $borrowing;

@@ -18,7 +18,7 @@
                         Assets
                     @elseif (Route::is('users.index'))
                         Users
-                    @elseif (Route::is('borrowing'))
+                    @elseif (Route::is('borrowings.index'))
                         Borrowing
                     @else
                         Page

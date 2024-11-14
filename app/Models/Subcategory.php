@@ -11,7 +11,7 @@ class Subcategory extends Model
      *
      * @var string
      */
-    protected $table = 'subcategory';
+    protected $table = 'subcategories';
 
     /**
      * The attributes that are mass assignable.

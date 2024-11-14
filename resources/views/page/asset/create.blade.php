@@ -97,38 +97,18 @@
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                 </div>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="condition" class="text-sm font-medium text-gray-700">Condition *</label>
-                                        <select name="condition" id="condition" required
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                            <option value="">Select Condition</option>
-                                            <option value="new">New</option>
-                                            <option value="used">Used</option>
-                                            <option value="damaged">Damaged</option>
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label for="status" class="text-sm font-medium text-gray-700">Status *</label>
-                                        <select name="status" id="status" required
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                            <option value="">Select Status</option>
-                                            <option value="available">Available</option>
-                                            <option value="in_use">In Use</option>
-                                            <option value="maintenance">Maintenance</option>
-                                            <option value="disposed">Disposed</option>
-                                        </select>
-                                    </div>
-                                </div>
-
                                 <div>
-                                    <label for="location" class="text-sm font-medium text-gray-700">Location</label>
-                                    <input type="text" name="location" id="location"
+                                    <label for="condition" class="text-sm font-medium text-gray-700">Condition *</label>
+                                    <select name="condition" id="condition" required
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                        <option value="">Select Condition</option>
+                                        <option value="new">New</option>
+                                        <option value="used">Used</option>
+                                        <option value="damaged">Damaged</option>
+                                    </select>
+                                    <input type="text" name="status" id="status" value="available" class="hidden">
+                                    <input type="text" name="location" id="location" value="HRGA" class="hidden">
                                 </div>
-
                                 <div>
                                     <label for="remaks" class="text-sm font-medium text-gray-700">Remarks</label>
                                     <textarea name="remaks" id="remaks" rows="3"

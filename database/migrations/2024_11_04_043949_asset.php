@@ -23,7 +23,7 @@ return new class extends Migration
             $table->integer('quantity');
             $table->string('condition');
             $table->enum('status', ['borrowed', 'available', 'other']);
-            $table->string('remaks')->nullable();
+            $table->string('remarks')->nullable();
             $table->string('location');
             $table->text('asset_detail_url');
             $table->string('qr_code_path')->nullable();

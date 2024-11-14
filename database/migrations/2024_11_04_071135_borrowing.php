@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('borrowing', function(Blueprint $table){
+        Schema::create('borrowings', function(Blueprint $table){
             $table->id();
             $table->date('date_of_receipt');
             $table->date('date_of_return')->nullable();
             $table->enum('status', ['borrowed', 'returned', 'late']);
-            $table->foreignId('asset_id')->constrained(
-                table:'assets', indexName:'asset_id'
-            );
-            $table->foreignId('employee_id')->constrained('employee');
+            $table->foreignId('asset_id')->constrained('assets');
+            $table->foreignId('employee_id')->constrained('employees');
             $table->timestamps();
         });
     }

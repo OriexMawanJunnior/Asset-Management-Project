@@ -7,13 +7,9 @@ use Carbon\Carbon;
 
 class Asset extends Model
 {
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    // public $timestamps = false;
     protected $table = 'assets';
+
+    protected const LOCATION_CODE = 'HQR'; 
 
     /**
      * The attributes that are mass assignable.
@@ -31,7 +27,7 @@ class Asset extends Model
         'quantity',
         'condition',
         'status',
-        'remaks',
+        'remarks', 
         'location',
         'asset_detail_url',
         'qr_code_path',
@@ -59,64 +55,48 @@ class Asset extends Model
         return $this->belongsTo(Subcategory::class, 'subcategory_id');
     }
 
-
     public function borrowings(){
         return $this->hasMany(Borrowing::class);
     }
 
-    public static function boot()
+    /**
+     * Generate asset ID if it is not provided
+     */
+    public function setAssetIdAttribute($value)
     {
-        parent::boot();
-
-        static::creating(function ($asset) {
-            // Cek jika asset_id belum ada, buat asset_id baru
-            if (empty($asset->asset_id)) {
-                $asset->asset_id = self::generateAssetId($asset);
-            }
-        });
+        $this->attributes['asset_id'] = $value ?? self::generateAssetId($this);
     }
 
     private static function monthToRoman($month)
     {
         $romans = [
-            1 => 'I',
-            2 => 'II',
-            3 => 'III',
-            4 => 'IV',
-            5 => 'V',
-            6 => 'VI',
-            7 => 'VII',
-            8 => 'VIII',
-            9 => 'IX',
-            10 => 'X',
-            11 => 'XI',
-            12 => 'XII'
+            1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V',
+            6 => 'VI', 7 => 'VII', 8 => 'VIII', 9 => 'IX', 10 => 'X',
+            11 => 'XI', 12 => 'XII'
         ];
-
         return $romans[$month] ?? '';
     }
 
-
     public static function generateAssetId($asset)
     {
-        $locationCode = 'HQR'; // Ganti sesuai kebutuhan lokasi
+        $locationCode = self::LOCATION_CODE;
         $se = 'SE';
-        $categoryCode = $asset->category->code ?? 'NNN'; // Ambil kode dari kategori
-        $subCategoryCode = $asset->subcategory->code ?? 'NNN'; // Ambil kode dari subkategori
+        $categoryCode = $asset->category?->code ?? 'NNN';
+        $subCategoryCode = $asset->subcategory?->code ?? 'NNN';
 
-        $receiptMonth = self::monthToRoman(Carbon::parse($asset->date_of_receipt)->format('m'));
-        $receiptYear = Carbon::parse($asset->date_of_receipt)->format('Y');
+        // Handling date_of_receipt null case
+        $receiptDate = $asset->date_of_receipt ?? now();
+        $receiptMonth = self::monthToRoman(Carbon::parse($receiptDate)->format('m'));
+        $receiptYear = Carbon::parse($receiptDate)->format('Y');
 
-         // Cari urutan terakhir berdasarkan kolom number
-         $lastAsset = self::where('category_id', $asset->category_id)
+        // Find last asset in the same category and subcategory
+        $lastAsset = self::where('category_id', $asset->category_id)
                         ->where('subcategory_id', $asset->subcategory_id)
                         ->orderBy('number', 'desc')
                         ->first();
 
-        // Tentukan urutan selanjutnya dengan kolom `number`
+        // Determine next number in sequence
         $nextNumber = $lastAsset ? $lastAsset->number + 1 : 1;
-
-        // Set nilai number untuk asset baru
         $asset->number = $nextNumber;
 
         // Format asset_id
@@ -124,5 +104,16 @@ class Asset extends Model
         $assetId = "{$locationCode}/{$categoryCode}-{$subCategoryCode}/{$receiptMonth}/{$receiptYear}/{$se}/{$sequence}";
 
         return $assetId;
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($asset) {
+            if (empty($asset->asset_id)) {
+                $asset->asset_id = self::generateAssetId($asset);
+            }
+        });
     }
 }

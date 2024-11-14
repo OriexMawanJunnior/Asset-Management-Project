@@ -41,7 +41,6 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap flex justify-center gap-2">
-                                {{-- <div class="flex justify-start gap-2"> --}}
                                     <!-- View Details Button -->
                                     <a href="{{ route('assets.show', $asset->id) }}" class="text-green-600 hover:text-green-900" title="View Details">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
