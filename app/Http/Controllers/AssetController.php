@@ -61,6 +61,21 @@ class AssetController
             ->with('message', 'Asset deleted successfully');
     }
 
+    public function downloadQr($id)
+    {
+        $asset = $this->findAssetOrFail($id);
+        $qrPath = $asset->getQrCodePath();
+        
+        return response()->download(
+            public_path('qrcodes/' . $qrPath),
+            $qrPath,
+            [
+                'Content-Type' => 'image/png',
+                'Content-Disposition' => 'attachment'
+            ]
+        );
+    }
+
     private function validationRules(): array
     {
         return [

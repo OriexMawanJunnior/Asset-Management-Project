@@ -48,18 +48,26 @@
                                             <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
                                         </svg>
                                     </a>
-                                    <!-- QR Code Button -->
-                                    <button onclick="generateQR('{{ $asset->id }}')" class="text-yellow-600 hover:text-yellow-900" title="Generate QR Code">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                            <path d="M3 3h6v6H3V3zm2 2v2h2V5H5z"/>
-                                            <path d="M11 3h6v6h-6V3zm2 2v2h2V5h-2z"/>
-                                            <path d="M3 11h6v6H3v-6zm2 2v2h2v-2H5z"/>
-                                            <path d="M11 11h2v2h-2z"/>
-                                            <path d="M15 11h2v2h-2z"/>
-                                            <path d="M11 15h2v2h-2z"/>
-                                            <path d="M15 15h2v2h-2z"/>
-                                        </svg>
-                                    </button>
+                                    <!-- QR Code Button with Preview -->
+                                    <div class="relative group">
+                                        <a href="{{route('assets.qr.download', $asset->id)}}" class="text-yellow-600 hover:text-yellow-900" title="Download QR Code">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M3 3h6v6H3V3zm2 2v2h2V5H5z"/>
+                                                <path d="M11 3h6v6h-6V3zm2 2v2h2V5h-2z"/>
+                                                <path d="M3 11h6v6H3v-6zm2 2v2h2v-2H5z"/>
+                                                <path d="M11 11h2v2h-2z"/>
+                                                <path d="M15 11h2v2h-2z"/>
+                                                <path d="M11 15h2v2h-2z"/>
+                                                <path d="M15 15h2v2h-2z"/>
+                                            </svg>
+                                        </a>
+                                        <!-- Preview QR on hover -->
+                                        @if($asset->qr_code_path)
+                                        <div class="hidden group-hover:block absolute z-10 -top-40 left-1/2 transform -translate-x-1/2 bg-white p-2 rounded-lg shadow-lg">
+                                            <img src="{{ asset($asset->qr_code_path) }}" alt="QR Code" class="w-32 h-32">
+                                        </div>
+                                        @endif
+                                    </div>
                                     
                                     <!-- Edit Button -->
                                     <a href="{{route('assets.edit', $asset->id)}}" class="text-indigo-600 hover:text-indigo-900" title="Edit">
@@ -93,12 +101,4 @@
         </div>
     </div>
 </div>
-
-<script>
-function generateQR(assetId) {
-    // Implementasi generate QR code
-    alert('Generate QR Code for Asset ID: ' + assetId);
-    // Anda bisa menambahkan logika untuk generate QR code di sini
-}
-</script>
 @endsection

@@ -115,11 +115,11 @@
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
                                 </div>
 
-                                <div>
+                                {{-- <div>
                                     <label for="asset_detail_url" class="text-sm font-medium text-gray-700">Asset Detail URL</label>
                                     <input type="url" name="asset_detail_url" id="asset_detail_url"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                </div>
+                                </div> --}}
 
                                 <div>
                                     <label for="date_of_receipt" class="text-sm font-medium text-gray-700">Date of Receipt *</label>

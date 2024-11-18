@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Carbon\Carbon;
 
 class Asset extends Model
@@ -106,6 +107,48 @@ class Asset extends Model
         return $assetId;
     }
 
+    public function generateQrCode()
+    {
+        // Generate asset detail URL
+        $assetUrl = route('assets.show', $this->id);
+        
+        // Generate a clean filename without any slashes
+        $qrFilename = 'qr_asset_' . $this->id . '.png';
+        
+        // Create directory if it doesn't exist
+        $directoryPath = public_path('qrcodes');
+        if (!file_exists($directoryPath)) {
+            mkdir($directoryPath, 0755, true);
+        }
+
+        // Generate QR code
+        $qrImage = QrCode::format('png')
+                        ->size(300)
+                        ->margin(1)
+                        ->backgroundColor(255, 255, 255)
+                        ->generate($assetUrl);
+
+        // Save the file with a clean path
+        $fullPath = $directoryPath . DIRECTORY_SEPARATOR . $qrFilename;
+        file_put_contents($fullPath, $qrImage);
+        
+        // Store only the filename in the database
+        $this->update(['qr_code_path' => $qrFilename]);
+        
+        return $qrFilename;
+    }
+
+    public function getQrCodePath()
+    {
+        if (empty($this->qr_code_path) || !file_exists(public_path('qrcodes/' . $this->qr_code_path))) {
+            return $this->generateQrCode();
+        }
+        
+        return $this->qr_code_path;
+    }
+
+
+
     protected static function boot()
     {
         parent::boot();
@@ -113,6 +156,14 @@ class Asset extends Model
         static::creating(function ($asset) {
             if (empty($asset->asset_id)) {
                 $asset->asset_id = self::generateAssetId($asset);
+            }
+            // Generate QR code after asset is created
+            $asset->qr_code_path = null; // Will be generated on first access
+        });
+        static::deleting(function ($asset) {
+            // Delete QR code file when asset is deleted
+            if ($asset->qr_code_path && file_exists(public_path($asset->qr_code_path))) {
+                unlink(public_path($asset->qr_code_path));
             }
         });
     }

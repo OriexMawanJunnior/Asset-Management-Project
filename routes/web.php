@@ -16,6 +16,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'showDashboard'])->name('dashboard');
     Route::resource('assets', AssetController::class);
+    Route::get('/assets/{asset}/qr-download', [AssetController::class, 'downloadQr'])->name('assets.qr.download');
     Route::resource('users', EmployeeController::class);
     Route::resource('borrowings', BorrowingController::class);
 });
