@@ -45,20 +45,31 @@
                                 
                                 <td class="px-6 py-4 whitespace-nowrap flex justify-center gap-2">
                                         <!-- View Details Button -->
-                                        <a href="{{ route('borrowings.show', $borrowing->id) }}" class="text-green-600 hover:text-green-900" title="View Details">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                                        <a href="{{ route('borrowings.document', $borrowing->id) }}" class="text-green-600 hover:text-green-900" title="View Details">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5"/>
                                             </svg>
                                         </a>
                                     
                                         
                                         <!-- Edit Button -->
-                                        <a href="{{route('borrowings.edit', $borrowing->id)}}" class="text-indigo-600 hover:text-indigo-900" title="Edit">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                                            </svg>
-                                        </a>
+                                        <form action="{{route('borrowings.update', $borrowing->id)}}" method="POST" class="text-indigo-600 hover:text-indigo-900" title="Return Button">
+                                            @csrf
+                                            @method('PUT')
+                                            <input name="asset_id" type="text" class="hidden" value="{{$borrowing->asset_id}}">
+                                            <input name="employee_id" type="text" class="hidden" value="{{$borrowing->employee_id}}">
+                                            <input name="date_of_receipt" type="date" class="hidden" value="{{ date('Y-m-d', strtotime($borrowing->date_of_receipt)) }}">
+                                            <input name="date_of_return" type="date" class="hidden" value="{{ now()->format('Y-m-d') }}">
+                                            <input name="status" type="text" class="hidden" value="returned">
+                                            <button type="submit">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5">
+                                                        <g fill="none" stroke="currentColor" stroke-width="3    " stroke-linecap="round" stroke-linejoin="round">
+                                                          <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c2.39 0 4.68.94 6.36 2.63l1.64-1.64" />
+                                                          <path d="M21 5v4h-4" />
+                                                        </g>
+                                                    </svg>
+                                            </button>
+                                        </form>
                                         
                                         <!-- Delete Button -->
                                         <form action="{{route('borrowings.destroy', $borrowing->id)}}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this asset?');">

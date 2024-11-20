@@ -13,6 +13,11 @@
                             
                             <div class="grid grid-cols-1 gap-4">
                                 <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 rounded-lg">
+                                    <dt class="text-sm font-medium text-gray-500">Asset ID</dt>
+                                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $asset->asset_id }}</dd>
+                                </div>
+
+                                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 rounded-lg">
                                     <dt class="text-sm font-medium text-gray-500">Name</dt>
                                     <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $asset->name }}</dd>
                                 </div>
@@ -29,25 +34,33 @@
 
                                 {{-- Continue with all other fields --}}
 
-                                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 rounded-lg">
-                                    <dt class="text-sm font-medium text-gray-500">Merk</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $asset->merk ?? '-' }}</dd>
-                                </div>
+                                @if($asset->merk)
+                                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 rounded-lg">
+                                        <dt class="text-sm font-medium text-gray-500">Merk</dt>
+                                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $asset->merk ?? '-' }}</dd>
+                                    </div>
+                                @endif
 
-                                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 rounded-lg">
-                                    <dt class="text-sm font-medium text-gray-500">Color</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $asset->color ?? '-' }}</dd>
-                                </div>
+                                @if($asset->color)
+                                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 rounded-lg">
+                                        <dt class="text-sm font-medium text-gray-500">Color</dt>
+                                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $asset->color ?? '-' }}</dd>
+                                    </div>
+                                @endif
 
-                                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 rounded-lg">
-                                    <dt class="text-sm font-medium text-gray-500">Serial Number</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $asset->serial_number ?? '-' }}</dd>
-                                </div>
+                                @if($asset->serial_number)
+                                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 rounded-lg">
+                                        <dt class="text-sm font-medium text-gray-500">Serial Number</dt>
+                                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $asset->serial_number ?? '-' }}</dd>
+                                    </div>
+                                @endif
 
-                                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 rounded-lg">
-                                    <dt class="text-sm font-medium text-gray-500">Purchase Order Number</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $asset->purchase_order_number ?? '-' }}</dd>
-                                </div>
+                                @if($asset->purchase_order_number)
+                                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 rounded-lg">
+                                        <dt class="text-sm font-medium text-gray-500">Purchase Order Number</dt>
+                                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $asset->purchase_order_number ?? '-' }}</dd>
+                                    </div>
+                                @endif
 
                                 <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 rounded-lg">
                                     <dt class="text-sm font-medium text-gray-500">Purchase Price</dt>
@@ -58,11 +71,6 @@
                                             -
                                         @endif
                                     </dd>
-                                </div>
-
-                                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 rounded-lg">
-                                    <dt class="text-sm font-medium text-gray-500">Quantity</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $asset->quantity }}</dd>
                                 </div>
 
                                 <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 rounded-lg">
@@ -95,20 +103,11 @@
                                     <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $asset->location ?? '-' }}</dd>
                                 </div>
 
-                                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 rounded-lg">
-                                    <dt class="text-sm font-medium text-gray-500">Remarks</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $asset->remaks ?? '-' }}</dd>
-                                </div>
-
-                                @if($asset->asset_detail_url)
-                                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 rounded-lg">
-                                    <dt class="text-sm font-medium text-gray-500">Asset Detail URL</dt>
-                                    <dd class="mt-1 text-sm text-blue-600 sm:mt-0 sm:col-span-2">
-                                        <a href="{{ $asset->asset_detail_url }}" target="_blank" class="hover:underline">
-                                            {{ $asset->asset_detail_url }}
-                                        </a>
-                                    </dd>
-                                </div>
+                                @if($asset->remarks)
+                                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 rounded-lg">
+                                        <dt class="text-sm font-medium text-gray-500">Remarks</dt>
+                                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $asset->remaks ?? '-' }}</dd>
+                                    </div>
                                 @endif
 
                                 <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 rounded-lg">
@@ -123,7 +122,7 @@
                                 <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 rounded-lg">
                                     <dt class="text-sm font-medium text-gray-500">QR Code</dt>
                                     <dd class="mt-1 sm:mt-0 sm:col-span-2">
-                                        <img src="{{ asset($asset->qr_code_path) }}" alt="Asset QR Code" class="h-32 w-32">
+                                        <img src="{{ asset('qrcodes/' . $asset->qr_code_path) }}" alt="Asset QR Code" class="h-32 w-32">
                                     </dd>
                                 </div>
                                 @endif

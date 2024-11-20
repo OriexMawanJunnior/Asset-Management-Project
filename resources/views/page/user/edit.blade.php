@@ -17,19 +17,19 @@
                                 {{-- Basic Information --}}
                                 <div class="space-y-4">
                                     <div>
-                                        <label for="name" class="text-sm font-medium text-gray-700">Name *</label>
+                                        <label for="name" class="text-sm font-medium text-gray-700">Name <span class="text-red-500">*</span></label>
                                         <input type="text" name="name" id="name" required
                                             value="{{ old('name', $employee->name) }}"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                     <div>
-                                        <label for="organization" class="text-sm font-medium text-gray-700">Organization *</label>
+                                        <label for="organization" class="text-sm font-medium text-gray-700">Organization <span class="text-red-500">*</span></label>
                                         <input type="text" name="organization" id="organization" required
                                             value="{{ old('organization', $employee->organization) }}"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                     <div>
-                                        <label for="job_position" class="text-sm font-medium text-gray-700">Job Position *</label>
+                                        <label for="job_position" class="text-sm font-medium text-gray-700">Job Position <span class="text-red-500">*</span></label>
                                         <input type="text" name="job_position" id="job_position" required
                                             value="{{ old('job_position', $employee->job_position) }}"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">

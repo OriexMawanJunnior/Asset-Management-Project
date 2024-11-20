@@ -2,19 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Employee;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-
-class EmployeeController
+class EmployeeController 
 {
     /**
      * Display a listing of the employees.
      */
     public function index()
     {
-        $employees = Employee::paginate(10);
-        return view('page.user.index', compact('employees'));
+        try {
+            $employees = Employee::paginate(10);
+            return view('page.user.index', compact('employees'));
+        } catch (Exception $e) {
+            return back()->with('error', 'Failed to load employees. Please try again.');
+        }
     }
 
     /**
@@ -30,10 +36,22 @@ class EmployeeController
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate($this->validationRules());
-        Employee::create($validatedData);
-        return redirect()->route('users.index')
-            ->with('message', 'Employee created successfully');
+        try {
+            $validatedData = $request->validate($this->validationRules());
+            
+            $employee = Employee::create($validatedData);
+            
+            return redirect()->route('users.index')
+                ->with('message', 'Employee created successfully');
+        } catch (ValidationException $e) {
+            return back()
+                ->withErrors($e->errors())
+                ->withInput();
+        } catch (Exception $e) {
+            return back()
+                ->with('error', 'Failed to create employee. Please try again.')
+                ->withInput();
+        }
     }
 
     /**
@@ -41,8 +59,15 @@ class EmployeeController
      */
     public function show(string $id)
     {
-        $employee = $this->findEmployeeOrFail($id);
-        return view('page.user.show', compact('employee'));
+        try {
+            $employee = Employee::findOrFail($id);
+            return view('page.user.show', compact('employee'));
+        } catch (ModelNotFoundException $e) {
+            return redirect()->route('users.index')
+                ->with('error', 'Employee not found.');
+        } catch (Exception $e) {
+            return back()->with('error', 'An error occurred while fetching employee details.');
+        }
     }
 
     /**
@@ -50,8 +75,15 @@ class EmployeeController
      */
     public function edit(string $id)
     {
-        $employee = $this->findEmployeeOrFail($id);
-        return view('page.user.edit', compact('employee'));
+        try {
+            $employee = Employee::findOrFail($id);
+            return view('page.user.edit', compact('employee'));
+        } catch (ModelNotFoundException $e) {
+            return redirect()->route('users.index')
+                ->with('error', 'Employee not found.');
+        } catch (Exception $e) {
+            return back()->with('error', 'An error occurred while preparing employee edit.');
+        }
     }
 
     /**
@@ -59,11 +91,27 @@ class EmployeeController
      */
     public function update(Request $request, string $id)
     {
-        $employee = $this->findEmployeeOrFail($id);
-        $validatedData = $request->validate($this->validationRules());
-        $employee->update($validatedData);
-        return redirect()->route('users.index')
-            ->with('message', 'Employee updated successfully');
+        try {
+            $employee = Employee::findOrFail($id);
+            
+            $validatedData = $request->validate($this->validationRules());
+            
+            $employee->update($validatedData);
+            
+            return redirect()->route('users.index')
+                ->with('message', 'Employee updated successfully');
+        } catch (ValidationException $e) {
+            return back()
+                ->withErrors($e->errors())
+                ->withInput();
+        } catch (ModelNotFoundException $e) {
+            return redirect()->route('users.index')
+                ->with('error', 'Employee not found.');
+        } catch (Exception $e) {
+            return back()
+                ->with('error', 'Failed to update employee. Please try again.')
+                ->withInput();
+        }
     }
 
     /**
@@ -71,10 +119,18 @@ class EmployeeController
      */
     public function destroy(string $id)
     {
-        $employee = $this->findEmployeeOrFail($id);
-        $employee->delete();
-        return redirect()->route('users.index')
-            ->with('message', 'Employee deleted successfully');
+        try {
+            $employee = Employee::findOrFail($id);
+            $employee->delete();
+            
+            return redirect()->route('users.index')
+                ->with('message', 'Employee deleted successfully');
+        } catch (ModelNotFoundException $e) {
+            return redirect()->route('users.index')
+                ->with('error', 'Employee not found.');
+        } catch (Exception $e) {
+            return back()->with('error', 'Failed to delete employee. Please try again.');
+        }
     }
 
     /**
@@ -83,23 +139,9 @@ class EmployeeController
     private function validationRules(): array
     {
         return [
-            'name' => 'required|string',
-            'organization' => 'required|string',
-            'job_position' => 'required|string',
+            'name' => 'required|string|max:255',
+            'organization' => 'required|string|max:255',
+            'job_position' => 'required|string|max:255',
         ];
-    }
-
-    /**
-     * Find an employee by ID or return a 404 error response.
-     */
-    private function findEmployeeOrFail(string $id): Employee
-    {
-        $employee = Employee::find($id);
-
-        if (!$employee) {
-            abort(404, 'Employee not found');
-        }
-
-        return $employee;
     }
 }

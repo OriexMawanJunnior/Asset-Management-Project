@@ -7,21 +7,8 @@
         <div class="bg-purple-700 p-8 rounded-lg shadow-lg w-96">
             <h1 class="text-3xl font-bold text-white mb-8">Login</h1>
             
-            @if (session('status'))
-                <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-                    {{ session('status') }}
-                </div>
-            @endif
 
-            @if ($errors->any())
-                <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-                    <ul class="list-disc list-inside">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+            
 
             <form action="{{ route('signIn') }}" method="POST">
                 @csrf
@@ -42,7 +29,7 @@
                         <input 
                             type="password" 
                             name="password" 
-                            class="w-full px-4 py-2 rounded-lg @error('password') border-red-500 @enderror" 
+                            class="w-full mb-8 px-4 py-2 rounded-lg @error('password') border-red-500 @enderror" 
                             required
                         >
                     </div>

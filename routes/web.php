@@ -19,5 +19,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/assets/{asset}/qr-download', [AssetController::class, 'downloadQr'])->name('assets.qr.download');
     Route::resource('users', EmployeeController::class);
     Route::resource('borrowings', BorrowingController::class);
+    Route::get('/borrowings/{borrowings}/document', [BorrowingController::class, 'downloadDocument'])->name('borrowings.document');
 });
 

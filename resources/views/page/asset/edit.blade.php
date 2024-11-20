@@ -17,7 +17,7 @@
                             
                             <div class="space-y-4">
                                 <div>
-                                    <label for="name" class="text-sm font-medium text-gray-700">Name *</label>
+                                    <label for="name" class="text-sm font-medium text-gray-700">Name <span class="text-red-500">*</span></label>
                                     <input type="text" name="name" id="name" required
                                         value="{{ old('name', $asset->name) }}"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
@@ -39,7 +39,7 @@
                                 {{-- Autocomplete Components with Existing Values --}}
                                 @foreach($fields as $field)
                                 <div>
-                                    <label for="{{ $field['id'] }}" class="text-sm font-medium text-gray-700">{{ $field['label'] }} *</label>
+                                    <label for="{{ $field['id'] }}" class="text-sm font-medium text-gray-700">{{ $field['label'] }} <span class="text-red-500">*</span></label>
                                     <div class="relative">
                                         <input type="text" 
                                             id="{{ $field['id'] }}_search" 
@@ -99,16 +99,11 @@
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
 
-                                    <div>
-                                        <label for="quantity" class="text-sm font-medium text-gray-700">Quantity *</label>
-                                        <input type="number" name="quantity" id="quantity" required
-                                            value="{{ old('quantity', $asset->quantity) }}"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    </div>
+                                
                                 </div>
 
                                     <div>
-                                        <label for="condition" class="text-sm font-medium text-gray-700">Condition *</label>
+                                        <label for="condition" class="text-sm font-medium text-gray-700">Condition <span class="text-red-500">*</span></label>
                                         <select name="condition" id="condition" required
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                             <option value="">Select Condition</option>
@@ -118,13 +113,7 @@
                                         </select>
                                     </div>
                                 <input type="text" name="status" id="status" value="{{old('status', $asset->status)}}" class="hidden">
-                                <div>
-                                    <label for="location" class="text-sm font-medium text-gray-700">Location</label>
-                                    <input type="text" name="location" id="location"
-                                        value="{{ old('location', $asset->location) }}"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        disabled>
-                                </div>
+                                <input type="text" name="location" id="location" value="{{old('location', $asset->location)}}" class="hidden">
 
                                 <div>
                                     <label for="remaks" class="text-sm font-medium text-gray-700">Remarks</label>
@@ -132,15 +121,10 @@
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"> {{ old('remaks', $asset->remaks) }}</textarea>
                                 </div>
 
-                                <div>
-                                    <label for="asset_detail_url" class="text-sm font-medium text-gray-700">Asset Detail URL</label>
-                                    <input type="url" name="asset_detail_url" id="asset_detail_url"
-                                        value="{{ old('merk', $asset->asset_detail_url) }}"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                </div>
+                        
 
                                 <div>
-                                    <label for="date_of_receipt" class="text-sm font-medium text-gray-700">Date of Receipt *</label>
+                                    <label for="date_of_receipt" class="text-sm font-medium text-gray-700">Date of Receipt <span class="text-red-500">*</span></label>
                                     <input type="date" name="date_of_receipt" id="date_of_receipt" required
                                         value="{{ old('date_of_receipt', \Carbon\Carbon::parse($asset->date_of_receipt)->format('Y-m-d'))}}"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">

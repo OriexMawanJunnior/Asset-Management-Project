@@ -60,14 +60,6 @@ class Asset extends Model
         return $this->hasMany(Borrowing::class);
     }
 
-    /**
-     * Generate asset ID if it is not provided
-     */
-    public function setAssetIdAttribute($value)
-    {
-        $this->attributes['asset_id'] = $value ?? self::generateAssetId($this);
-    }
-
     private static function monthToRoman($month)
     {
         $romans = [
@@ -75,7 +67,7 @@ class Asset extends Model
             6 => 'VI', 7 => 'VII', 8 => 'VIII', 9 => 'IX', 10 => 'X',
             11 => 'XI', 12 => 'XII'
         ];
-        return $romans[$month] ?? '';
+        return $romans[(int)$month] ?? '';
     }
 
     public static function generateAssetId($asset)
@@ -87,12 +79,18 @@ class Asset extends Model
 
         // Handling date_of_receipt null case
         $receiptDate = $asset->date_of_receipt ?? now();
-        $receiptMonth = self::monthToRoman(Carbon::parse($receiptDate)->format('m'));
-        $receiptYear = Carbon::parse($receiptDate)->format('Y');
+        $parsedDate = Carbon::parse($receiptDate);
+        
+        // Fix: Ensure we're getting the numeric month and converting it properly
+        $receiptMonth = self::monthToRoman($parsedDate->format('n')); // Using 'n' for numeric month without leading zeros
+        $receiptMonthWithoutFormat = $parsedDate->format('m');
+        $receiptYear = $parsedDate->format('Y');
 
         // Find last asset in the same category and subcategory
         $lastAsset = self::where('category_id', $asset->category_id)
                         ->where('subcategory_id', $asset->subcategory_id)
+                        ->whereMonth('date_of_receipt', $receiptMonthWithoutFormat)
+                        ->whereYear('date_of_receipt', $receiptYear)
                         ->orderBy('number', 'desc')
                         ->first();
 
@@ -100,8 +98,10 @@ class Asset extends Model
         $nextNumber = $lastAsset ? $lastAsset->number + 1 : 1;
         $asset->number = $nextNumber;
 
-        // Format asset_id
+        // Format asset_id with explicit separator handling
         $sequence = str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
+        
+        // Fix: Ensure proper formatting with Roman numeral month
         $assetId = "{$locationCode}/{$categoryCode}-{$subCategoryCode}/{$receiptMonth}/{$receiptYear}/{$se}/{$sequence}";
 
         return $assetId;
@@ -111,9 +111,9 @@ class Asset extends Model
     {
         // Generate asset detail URL
         $assetUrl = route('assets.show', $this->id);
-        
+        $assetId = str_replace('/','_', $this->asset_id);
         // Generate a clean filename without any slashes
-        $qrFilename = 'qr_asset_' . $this->id . '.png';
+        $qrFilename = 'qr_asset_' . $assetId . '.png';
         
         // Create directory if it doesn't exist
         $directoryPath = public_path('qrcodes');
@@ -157,8 +157,23 @@ class Asset extends Model
             if (empty($asset->asset_id)) {
                 $asset->asset_id = self::generateAssetId($asset);
             }
-            // Generate QR code after asset is created
-            $asset->qr_code_path = null; // Will be generated on first access
+        });
+        static::updating(function($asset){
+            $categoryChanged = $asset->isDirty('category_id');
+            $subcategoryChanged = $asset->isDirty('subcategory_id');
+
+            $newDateOfReceipt = Carbon::parse($asset->getAttribute('date_of_receipt'));
+            $oldDateOfReceipt = Carbon::parse($asset->getOriginal('date_of_receipt'));
+    
+            $dateChanged = $newDateOfReceipt->month !== $oldDateOfReceipt->month || 
+                           $newDateOfReceipt->year !== $oldDateOfReceipt->year;
+            
+            if ($categoryChanged || $subcategoryChanged || $dateChanged) {
+                $asset->asset_id = self::generateAssetId($asset);
+                if ($asset->qr_code_path && file_exists(public_path($asset->qr_code_path))) {
+                    unlink(public_path($asset->qr_code_path));
+                }
+            }
         });
         static::deleting(function ($asset) {
             // Delete QR code file when asset is deleted

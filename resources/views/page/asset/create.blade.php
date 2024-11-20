@@ -16,7 +16,7 @@
                             {{-- Basic Information --}}
                             <div class="space-y-4">
                                 <div>
-                                    <label for="name" class="text-sm font-medium text-gray-700">Name *</label>
+                                    <label for="name" class="text-sm font-medium text-gray-700">Name <span class="text-red-500">*</span></label>
                                     <input type="text" name="name" id="name" required
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 </div>
@@ -39,7 +39,7 @@
 
                                 @foreach($fields as $field)
                                 <div>
-                                <label for="{{ $field['id'] }}" class="text-sm font-medium text-gray-700">{{ $field['label'] }} *</label>
+                                <label for="{{ $field['id'] }}" class="text-sm font-medium text-gray-700">{{ $field['label'] }} <span class="text-red-500">*</span></label>
                                     <div class="relative">
                                         <input type="text" 
                                             id="{{ $field['id'] }}_search" 
@@ -83,22 +83,17 @@
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                 </div>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="purchase_price" class="text-sm font-medium text-gray-700">Purchase Price</label>
-                                        <input type="number" name="purchase_price" id="purchase_price" step="0.01"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    </div>
-
-                                    <div>
-                                        <label for="quantity" class="text-sm font-medium text-gray-700">Quantity *</label>
-                                        <input type="number" name="quantity" id="quantity" required
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    </div>
-                                </div>
+                      
                                 <div>
-                                    <label for="condition" class="text-sm font-medium text-gray-700">Condition *</label>
+                                    <label for="purchase_price" class="text-sm font-medium text-gray-700">Purchase Price <span class="text-red-500">*</span></label>
+                                    <input type="number" name="purchase_price" id="purchase_price" required step="0.01"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                </div>
+
+                                    
+
+                                <div>
+                                    <label for="condition" class="text-sm font-medium text-gray-700">Condition <span class="text-red-500">*</span></label>
                                     <select name="condition" id="condition" required
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                         <option value="">Select Condition</option>
@@ -115,14 +110,8 @@
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
                                 </div>
 
-                                {{-- <div>
-                                    <label for="asset_detail_url" class="text-sm font-medium text-gray-700">Asset Detail URL</label>
-                                    <input type="url" name="asset_detail_url" id="asset_detail_url"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                </div> --}}
-
                                 <div>
-                                    <label for="date_of_receipt" class="text-sm font-medium text-gray-700">Date of Receipt *</label>
+                                    <label for="date_of_receipt" class="text-sm font-medium text-gray-700">Date of Receipt <span class="text-red-500">*</span></label>
                                     <input type="date" name="date_of_receipt" id="date_of_receipt" required
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 </div>
