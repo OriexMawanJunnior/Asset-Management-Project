@@ -159,10 +159,12 @@ class BorrowingController
         }
     }
 
-    public function downloadDocument(Borrowing $borrowing)
+    public function downloadDocument(int $id)
     {
         try {
             // Load template
+            $borrowing = Borrowing::findOrFail($id);
+
             $templatePath = storage_path('app/templates/asset_template.docx');
             $templateProcessor = new TemplateProcessor($templatePath);
 
