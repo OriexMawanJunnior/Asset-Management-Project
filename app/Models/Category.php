@@ -21,7 +21,7 @@ class Category extends Model
     protected $fillable = [
         'name',
         'code',
-        'remakrs',
+        'remarks',
     ];
 
     public function subcategories(){

@@ -21,6 +21,10 @@
                         Users
                     @elseif (Route::is('borrowings.index'))
                         Borrowing
+                    @elseif (Route::is('categories.index'))
+                        Categories
+                    @elseif (Route::is('subcategories.index'))
+                        Subcategories
                     @else
                         Page
                     @endif

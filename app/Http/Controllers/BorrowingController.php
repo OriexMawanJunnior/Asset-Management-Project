@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use PhpOffice\PhpWord\TemplateProcessor;
+use App\Services\DocumentNumberGenerator;
 use Carbon\Carbon;
 use Exception;
 
@@ -167,6 +168,7 @@ class BorrowingController
 
             $templatePath = storage_path('app/templates/asset_template.docx');
             $templateProcessor = new TemplateProcessor($templatePath);
+            $generator = new DocumentNumberGenerator();
 
             // Format current date
             $currentDate = Carbon::now()->locale('id')->isoFormat('D MMMM Y');
@@ -175,8 +177,10 @@ class BorrowingController
             $asset = $borrowing->asset;
             $employee = $borrowing->employee;
 
+            $documentNumber = $generator->generateNumber();
+
             // Replace placeholders in the document
-            // $templateProcessor->setValue('no_dokumen', '0001/SPTTA/PPT-HRGA/X/2024');
+            $templateProcessor->setValue('no_dokumen', $documentNumber);
             $templateProcessor->setValue('tanggal', $currentDate);
             
             

@@ -4,113 +4,133 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Subcategory;
-use Illuminate\Http\JsonResponse;
+use App\Models\Category;
+use Exception;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class SubcategoryController
 {
     /**
-     * Display a listing of the subcategories.
+     * Display a listing of the subcategorys.
      */
-    public function index(): JsonResponse
+    public function index()
     {
-        $subcategories = Subcategory::all();
-
-        return response()->json([
-            'status_code' => 200,
-            'message' => 'Subcategories retrieved successfully',
-            'data' => $subcategories
-        ]);
+        try {
+            $subcategories = Subcategory::paginate(10);
+            return view('page.subcategory.index', compact('subcategories'));
+        } catch (Exception $e) {
+            return back()->with('error', 'Failed to load subcategorys. Please try again.');
+        }
     }
 
     /**
-     * Store a newly created subcategory.
+     * Show the form for creating a new subcategory.
      */
-    public function store(Request $request): JsonResponse
+    public function create()
     {
-        $validatedData = $request->validate($this->validationRules());
-
-        $subcategory = Subcategory::create($validatedData);
-
-        return response()->json([
-            'status_code' => 201,
-            'message' => 'Subcategory created successfully',
-            'data' => $subcategory
-        ], 201);
+        $categories = Category::select('id', 'name')->get();
+        return view('page.subcategory.create', compact('categories'));
     }
 
     /**
-     * Display the specified subcategory.
+     * Store a newly created subcategory in storage.
      */
-    public function show(string $id): JsonResponse
+    public function store(Request $request)
     {
-        $subcategory = $this->findSubcategoryOrFail($id);
+        try {
+            $validatedData = $request->validate($this->validationRules());
+            
+            $Subcategory = Subcategory::create($validatedData);
+            
+            return redirect()->route('subcategories.index')
+                ->with('message', 'subcategory created successfully');
+        } catch (ValidationException $e) {
+            return back()
+                ->withErrors($e->errors())
+                ->withInput();
+        } catch (Exception $e) {
+            return back()
+                ->with('error', 'Failed to create subcategory. Please try again.')
+                ->withInput();
+        }
+    }
 
-        return response()->json([
-            'status_code' => 200,
-            'message' => 'Subcategory retrieved successfully',
-            'data' => $subcategory
-        ]);
+
+    /**
+     * Show the form for editing the specified subcategory.
+     */
+    public function edit(string $id)
+    {
+        try {
+            $subcategory = Subcategory::findOrFail($id);
+            $categories = Category::select('id', 'name')->get();
+            return view('page.subcategory.edit', compact('subcategory', 'categories'));
+        } catch (ModelNotFoundException $e) {
+            return redirect()->route('subcategories.index')
+                ->with('error', 'subcategory not found.');
+        } catch (Exception $e) {
+            return back()->with('error', 'An error occurred while preparing subcategory edit.');
+        }
     }
 
     /**
-     * Update the specified subcategory.
+     * Update the specified subcategory in storage.
      */
-    public function update(Request $request, string $id): JsonResponse
+    public function update(Request $request, string $id)
     {
-        $subcategory = $this->findSubcategoryOrFail($id);
-
-        $validatedData = $request->validate($this->validationRules());
-
-        $subcategory->update($validatedData);
-
-        return response()->json([
-            'status_code' => 200,
-            'message' => 'Subcategory updated successfully',
-            'data' => $subcategory
-        ]);
+        try {
+            $subcategory = Subcategory::findOrFail($id);
+            
+            $validatedData = $request->validate($this->validationRules());
+            
+            $subcategory->update($validatedData);
+            
+            return redirect()->route('subcategories.index')
+                ->with('message', 'subcategory updated successfully');
+        } catch (ValidationException $e) {
+            return back()
+                ->withErrors($e->errors())
+                ->withInput();
+        } catch (ModelNotFoundException $e) {
+            return redirect()->route('subcategories.index')
+                ->with('error', 'subcategory not found.');
+        } catch (Exception $e) {
+            return back()
+                ->with('error', 'Failed to update subcategory. Please try again.')
+                ->withInput();
+        }
     }
 
     /**
-     * Remove the specified subcategory.
+     * Remove the specified subcategory from storage.
      */
-    public function destroy(string $id): JsonResponse
+    public function destroy(string $id)
     {
-        $subcategory = $this->findSubcategoryOrFail($id);
-
-        $subcategory->delete();
-
-        return response()->json([
-            'status_code' => 200,
-            'message' => 'Subcategory deleted successfully'
-        ]);
+        try {
+            $subcategory = Subcategory::findOrFail($id);
+            $subcategory->delete();
+            
+            return redirect()->route('subcategories.index')
+                ->with('message', 'subcategory deleted successfully');
+        } catch (ModelNotFoundException $e) {
+            return redirect()->route('subcategories.index')
+                ->with('error', 'subcategory not found.');
+        } catch (Exception $e) {
+            return back()->with('error', 'Failed to delete subcategory. Please try again.');
+        }
     }
 
     /**
-     * Validation rules for storing and updating subcategories.
+     * Validation rules for storing and updating subcategorys.
      */
     private function validationRules(): array
     {
         return [
-            'name' => 'required|string',
-            'code' => 'required|string|max:3',
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:4',
             'category_id' => 'required|exists:categories,id',
         ];
     }
-
-    /**
-     * Find a subcategory by ID or return a 404 error response.
-     */
-    private function findSubcategoryOrFail(string $id): Subcategory
-    {
-        $subcategory = Subcategory::find($id);
-
-        if (!$subcategory) {
-            abort(response()->json([
-                'status_code' => 404,
-                'message' => 'Subcategory not found'
-            ], 404));
-        }
-
-        return $subcategory;
-    }
 }
+

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
+use App\Services\DocumentNumberGenerator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -12,7 +13,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(DocumentNumberGenerator::class);
     }
 
     /**
@@ -21,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
     
     public function boot()
     {
-        Paginator::defaultView('vendor.pagination.tailwind'); // Jika ingin menggunakan style tailwind
+        Paginator::defaultView('vendor.pagination.tailwind'); 
     }
     
 }

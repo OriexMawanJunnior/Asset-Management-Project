@@ -4,6 +4,8 @@ use App\Http\Controllers\AssetController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BorrowingController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SubcategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 
@@ -20,5 +22,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('users', EmployeeController::class);
     Route::resource('borrowings', BorrowingController::class);
     Route::get('/borrowings/{borrowings}/document', [BorrowingController::class, 'downloadDocument'])->name('borrowings.document');
+    Route::resource('categories', CategoryController::class);
+    Route::resource('subcategories', SubcategoryController::class);
 });
 
