@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Borrowing Page')
+
 
 @section('content')
     <div class="py-6">

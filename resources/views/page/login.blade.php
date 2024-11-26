@@ -1,6 +1,6 @@
 @extends('layouts.blank')
 
-@section('title', 'Login Page')
+
 
 @section('content')
     <div class="min-h-screen flex items-center justify-center">

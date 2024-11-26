@@ -1,6 +1,6 @@
 @extends('layouts.blank')
 
-@section('title', 'Asset Create')
+
 
 @section('content')
 <div class="min-h-screen py-6 flex flex-col justify-center sm:py-12">
