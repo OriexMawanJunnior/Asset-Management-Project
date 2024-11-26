@@ -17,7 +17,7 @@
         "DB_DATABASE": "postgres",
         "DB_USERNAME": "postgres.kkdnqjwltqzwqqizocyq",
         "DB_PASSWORD": "nazJ62WmEvWNE$V",
-        "APP_URL": "https://asset-management-system.app",
+        "APP_URL": "https://asset-management-project.vercel.app",
         "APP_CONFIG_CACHE": "/tmp/config.php",
         "APP_EVENTS_CACHE": "/tmp/events.php",
         "APP_PACKAGES_CACHE": "/tmp/packages.php",
