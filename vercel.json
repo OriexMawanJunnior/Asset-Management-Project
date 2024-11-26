@@ -8,8 +8,5 @@
     "env": {
         "APP_ENV": "production",
         "APP_DEBUG": "false"
-    },
-    "php": {
-        "version": "8.2"
     }
 }
