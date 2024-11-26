@@ -1,11 +1,13 @@
 {
     "version": 2,
-    "buildCommand": "curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && composer install && php artisan config:clear && php artisan route:clear && php artisan view:clear",
+    "builds": [
+        { "src": "composer.json", "use": "@vercel/php" }
+    ],
+    "routes": [
+        { "src": "/(.*)", "dest": "/api/index.php" }
+    ],
     "env": {
         "APP_ENV": "production",
         "APP_DEBUG": "false"
-    },
-    "rewrites": [
-        { "source": "/(.*)", "destination": "/api/index.php" }
-    ]
+    }
 }
