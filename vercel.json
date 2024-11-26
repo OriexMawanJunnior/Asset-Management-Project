@@ -6,14 +6,11 @@
     ],
     "routes": [
         {
-            "src": "/(css|js)/(.*)",
-            "dest": "public/$1/$2"
-        },
-        {
             "src": "/(.*)",
             "dest": "/api/index.php"
         }
     ],
+    "buildCommand": "npm install && npm run build",
     "env": {
         "APP_ENV": "production",
         "APP_KEY": "base64:wGWlmmz5GScKttRSQCleB2JGFGBXjrgklkdltiv+Qhc=",
