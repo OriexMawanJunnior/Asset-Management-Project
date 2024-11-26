@@ -1,9 +1,6 @@
 {
     "version": 2,
     "buildCommand": "composer install && php artisan config:clear && php artisan route:clear && php artisan view:clear",
-    "routes": [
-        { "src": "/(.*)", "dest": "/api/index.php" }
-    ],
     "env": {
         "APP_ENV": "production",
         "APP_DEBUG": "false"
