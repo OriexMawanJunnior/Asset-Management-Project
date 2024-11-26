@@ -9,14 +9,6 @@ export default defineConfig({
         }),
     ],
     build: {
-        manifest: true,
         outDir: 'public/build',
-        rollupOptions: {
-            output: {
-              chunkFileNames: '[name]-[hash].js',
-              entryFileNames: '[name]-[hash].js',
-              assetFileNames: '[name]-[hash].[ext]'
-            }
-          }
     },
 });
