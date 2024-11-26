@@ -8,7 +8,7 @@
     "routes": [
         {
             "src": "/qrcodes/(.*)",
-            "dest": "/public/qrcodes/"
+            "dest": "/public/qrcodes/$1"
         },
         {
             "src": "/(.*)",
@@ -17,7 +17,13 @@
     ],
     "env": {
         "APP_ENV": "production",
-        "APP_DEBUG": "false"
-    },
-    "outputDirectory": "public"
+        "APP_DEBUG": "false",
+        "APP_KEY": "base64:wGWlmmz5GScKttRSQCleB2JGFGBXjrgklkdltiv+Qhc=",
+        "DB_CONNECTION": "pgsql",
+        "DB_HOST":"aws-0-ap-southeast-1.pooler.supabase.com",
+        "DB_PORT": "5432",
+        "DB_DATABASE": "postgres",
+        "DB_USERNAME": "postgres.kkdnqjwltqzwqqizocyq",
+        "DB_PASSWORD": "nazJ62WmEvWNE$V"
+    }
 }
