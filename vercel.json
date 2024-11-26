@@ -1,0 +1,15 @@
+{
+    "version": 2,
+    "framework": "php",
+    "buildCommand": "composer install && php artisan config:clear",
+    "routes": [
+        { "src": "/(.*)", "dest": "/api/index.php" }
+    ],
+    "env": {
+        "APP_ENV": "production",
+        "APP_DEBUG": "false"
+    },
+    "php": {
+        "version": "8.2"
+    }
+}
