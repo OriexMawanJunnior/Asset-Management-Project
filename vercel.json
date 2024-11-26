@@ -1,6 +1,6 @@
 {
     "version": 2,
-    "buildCommand": "composer install && php artisan config:clear && php artisan route:clear && php artisan view:clear",
+    "buildCommand": "curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && composer install && php artisan config:clear && php artisan route:clear && php artisan view:clear",
     "env": {
         "APP_ENV": "production",
         "APP_DEBUG": "false"
