@@ -11,6 +11,10 @@
             "dest": "/public/qrcodes/$1"
         },
         {
+            "src": "/dist/(.*)",
+            "dest": "/public/dist/$1"
+        },
+        {
             "src": "/(.*)",
             "dest": "/api/index.php"
         }
