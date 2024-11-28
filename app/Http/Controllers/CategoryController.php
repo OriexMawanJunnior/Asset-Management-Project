@@ -15,12 +15,14 @@ class CategoryController
      */
     public function index()
     {
+       
         try {
             $categories = Category::paginate(10);
-            return view('page.category.index', compact('categories'));
+            return view('page.categories.index', compact('categories'));
         } catch (Exception $e) {
             return back()->with('error', 'Failed to load categorys. Please try again.');
         }
+        
     }
 
     /**
@@ -28,7 +30,7 @@ class CategoryController
      */
     public function create()
     {
-        return view('page.category.create');
+        return view('page.categories.create');
     }
 
     /**
@@ -62,7 +64,7 @@ class CategoryController
     {
         try {
             $category = Category::findOrFail($id);
-            return view('page.category.edit', compact('category'));
+            return view('page.categories.edit', compact('category'));
         } catch (ModelNotFoundException $e) {
             return redirect()->route('categories.index')
                 ->with('error', 'category not found.');
